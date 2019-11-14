@@ -32,8 +32,8 @@ client.once("ready", () => {
     reloadCatalog();
 });
 
-//client.login(auth.token);
-client.login(process.env.BOT_TOKEN);
+client.login(auth.token);
+//client.login(process.env.BOT_TOKEN);
 const findAttachmentInPost = post => {
     console.log("ATTACHMENT", post);
     let result = undefined;
@@ -83,8 +83,13 @@ setInterval(() => {
 
 setTimeout(() => {
     let channel = client.channels.find("name", "thread");
-    if (channel) threadChannel = channel;
-    console.log("WORKING CHANNEL", threadChannel);
+    let result = [];
+    client.channels.forEach(item => {
+        if (item.name === "thread") result.push(item);
+    });
+    console.log("CHANNELS!!!", result.length);
+    if (channel) threadChannel = result;
+    //console.log("WORKING CHANNEL", threadChannel);
 }, 5000);
 
 const sendNewPosts = () => {
@@ -109,7 +114,11 @@ const sendNewPosts = () => {
             },
             footerText: "#" + p.number
         });
-        threadChannel.send({ embed });
+        if (threadChannel) {
+            threadChannel.forEach(item => {
+                item.send({ embed });
+            });
+        }
     });
 };
 
