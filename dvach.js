@@ -17,6 +17,7 @@ export const getCurrentThreadDesc = () => {
     return currentThreadDesc;
 };
 
+//
 export const findBonbiThreadsSubjects = (listOnly = false, key = "бонби") => {
     const cat = getCatalogData();
     let threads = [];
