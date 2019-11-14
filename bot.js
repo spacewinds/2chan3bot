@@ -18,6 +18,7 @@ import {
     findCurrentThread
 } from "./dvach";
 // Configure logger settings
+global.crypto = require("crypto");
 logger.remove(logger.transports.Console);
 logger.add(new logger.transports.Console(), {
     colorize: true
