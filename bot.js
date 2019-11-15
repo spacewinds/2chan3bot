@@ -34,8 +34,8 @@ client.once("ready", () => {
     reloadCatalog();
 });
 
-client.login(auth.token);
-//client.login(process.env.BOT_TOKEN);
+//client.login(auth.token);
+client.login(process.env.BOT_TOKEN);
 const findAttachmentInPost = post => {
     console.log("ATTACHMENT", post);
     let result = undefined;
