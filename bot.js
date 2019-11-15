@@ -34,8 +34,8 @@ client.once("ready", () => {
     reloadCatalog();
 });
 
-//client.login(auth.token);
-client.login(process.env.BOT_TOKEN);
+client.login(auth.token);
+//client.login(process.env.BOT_TOKEN);
 const findAttachmentInPost = post => {
     console.log("ATTACHMENT", post);
     let result = undefined;
@@ -102,6 +102,10 @@ setTimeout(() => {
     console.log("clientid", client.user.id);
 }, 5000);
 
+const jsonCopy = src => {
+    return JSON.parse(JSON.stringify(src));
+};
+
 const updateLinkMap = channel => {
     let result = {};
     channel
@@ -127,7 +131,6 @@ const updateLinkMap = channel => {
                 let currentTitle = mItem.embeds.length
                     ? mItem.embeds[0].title
                     : "";
-                console.log(currentTitle);
                 if (currentTitle) {
                     let lastToken = currentTitle.split(" ");
                     lastToken = lastToken[lastToken.length - 1];
@@ -150,14 +153,14 @@ const updateLinkMap = channel => {
 };
 
 const preprocessPost = (channel, embed) => {
-    console.log("preprocessPost", embed.description);
-    let newDescription = embed.description;
-    let result = embed;
-    const tokens = embed.description.split(/(\s+)/);
+    console.log("LINMAP", linkMap);
+    console.log("preprocessPost", embed.description, channel.id);
+    const em = jsonCopy(embed);
+    let newDescription = em.description;
+    let result = em;
+    const tokens = em.description.split(/(\s+)/);
     tokens.forEach(item => {
-        console.log("currentToken", item);
         if (item.substring(0, 8).includes(">>")) {
-            console.log("PROCED");
             let id = item.replace(">>", "");
             if (linkMap[channel.id] && linkMap[channel.id]["#" + id]) {
                 console.log("found in history");
@@ -166,8 +169,6 @@ const preprocessPost = (channel, embed) => {
                     "[" + item + "](" + linkMap[channel.id]["#" + id] + ")"
                 );
             }
-        } else {
-            console.log("didnt pass");
         }
     });
     result.description = newDescription;
