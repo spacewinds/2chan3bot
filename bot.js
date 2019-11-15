@@ -27,6 +27,8 @@ logger.level = "debug";
 // Initialize Discord Bot
 var client = new Discord.Client();
 var threadChannel = null;
+let linkMap = {};
+
 client.once("ready", () => {
     console.log("Ready!");
     reloadCatalog();
@@ -39,12 +41,15 @@ const findAttachmentInPost = post => {
     let result = undefined;
     if (post.files && post.files.length > 0) {
         post.files.forEach(item => {
-            if (
-                item.path.toLowerCase().includes(".png") ||
-                item.path.toLowerCase().includes(".jpg")
-            ) {
-                console.log("GONNA RETURN " + "https://2ch.hk" + item.path);
-                result = "https://2ch.hk" + item.path;
+            if (!result) {
+                if (
+                    item.path.toLowerCase().includes(".png") ||
+                    item.path.toLowerCase().includes(".jpg") ||
+                    item.path.toLowerCase().includes(".gif")
+                ) {
+                    console.log("GONNA RETURN " + "https://2ch.hk" + item.path);
+                    result = "https://2ch.hk" + item.path;
+                }
             }
         });
     }
@@ -84,13 +89,90 @@ setInterval(() => {
 setTimeout(() => {
     let channel = client.channels.find("name", "thread");
     let result = [];
+    let id = "";
     client.channels.forEach(item => {
-        if (item.name === "thread") result.push(item);
+        if (item.name === "thread") {
+            result.push(item);
+            updateLinkMap(item);
+        }
     });
     console.log("CHANNELS!!!", result.length);
     if (channel) threadChannel = result;
     //console.log("WORKING CHANNEL", threadChannel);
+    console.log("clientid", client.user.id);
 }, 5000);
+
+const updateLinkMap = channel => {
+    let result = {};
+    channel
+        .fetchMessages()
+        .then(messages => {
+            console.log(
+                `${
+                    messages.filter(m => m.author.id === client.user.id).size
+                } messages`
+            );
+            const list = messages.last();
+            const messagesArray = list.channel.messages.array();
+            messagesArray.forEach(mItem => {
+                //console.log("ITEM", mItem);
+                /*console.log(
+                    "https://discordapp.com/channels/" +
+                        mItem.channel.guild.id +
+                        "/" +
+                        mItem.channel.id +
+                        "/" +
+                        mItem.id
+                );*/
+                let currentTitle = mItem.embeds.length
+                    ? mItem.embeds[0].title
+                    : "";
+                console.log(currentTitle);
+                if (currentTitle) {
+                    let lastToken = currentTitle.split(" ");
+                    lastToken = lastToken[lastToken.length - 1];
+                    //console.log("lastToken", lastToken);
+                    if (lastToken) {
+                        result[lastToken] =
+                            "https://discordapp.com/channels/" +
+                            mItem.channel.guild.id +
+                            "/" +
+                            mItem.channel.id +
+                            "/" +
+                            mItem.id;
+                    }
+                }
+            });
+            console.log("updateLinkMap => ", channel.id, result);
+            linkMap[channel.id] = result;
+        })
+        .catch(console.error);
+};
+
+const preprocessPost = (channel, embed) => {
+    console.log("preprocessPost", embed.description);
+    let newDescription = embed.description;
+    let result = embed;
+    const tokens = embed.description.split(/(\s+)/);
+    tokens.forEach(item => {
+        console.log("currentToken", item);
+        if (item.substring(0, 8).includes(">>")) {
+            console.log("PROCED");
+            let id = item.replace(">>", "");
+            if (linkMap[channel.id] && linkMap[channel.id]["#" + id]) {
+                console.log("found in history");
+                newDescription = newDescription.replace(
+                    item,
+                    "[" + item + "](" + linkMap[channel.id]["#" + id] + ")"
+                );
+            }
+        } else {
+            console.log("didnt pass");
+        }
+    });
+    result.description = newDescription;
+    return result;
+};
 
 const sendNewPosts = () => {
     const newPostsD = getNewPosts();
@@ -104,7 +186,9 @@ const sendNewPosts = () => {
                     currentThreadD.num +
                     ".html#" +
                     p.num,
-                text: striptags(decode(p.comment), [], "\n"),
+                text: decodeHtmlCharCodes(
+                    striptags(decode(p.comment), [], "\n")
+                ),
                 attachment: findAttachmentInPost(p),
                 date: new Date(p.timestamp * 1000)
             },
@@ -116,7 +200,10 @@ const sendNewPosts = () => {
         });
         if (threadChannel) {
             threadChannel.forEach(item => {
-                item.send({ embed });
+                item.send({ embed: preprocessPost(item, embed) });
+                setTimeout(() => {
+                    updateLinkMap(item);
+                }, 3000);
             });
         }
     });
@@ -125,7 +212,7 @@ const sendNewPosts = () => {
 client.on("message", async message => {
     console.log("MESSAGE", message.content);
     const content = message.content;
-    if (content.substring(0, 1) == "!") {
+    if (content.substring(0, 1) == "-") {
         var args = content.substring(1).split(" ");
         var cmd = args[0];
         console.log("args before", args);
@@ -172,32 +259,34 @@ client.on("message", async message => {
                 findNewPosts();
                 break;
             case "embed_last_post":
-                const newPostsD = getNewPosts();
+                const threadData = getCurrentThreadData();
+                const p =
+                    threadData.threads[0].posts[
+                        threadData.threads[0].posts.length - 1
+                    ];
                 const currentThreadD = getCurrentThreadDesc();
-                newPostsD.forEach(p => {
-                    const embed = generatePost({
-                        post: {
-                            number: p.num,
-                            url:
-                                "https://2ch.hk/fag/res/" +
-                                currentThreadD.num +
-                                ".html#" +
-                                p.num,
-                            text: striptags(decode(p.comment), [], "\n"),
-                            attachment: findAttachmentInPost(p),
-                            date: new Date(p.timestamp * 1000)
-                        },
-                        thread: {
-                            name: currentThreadD.subject,
-                            url:
-                                "https://2ch.hk/fag/res/" +
-                                currentThreadD.num +
-                                ".html"
-                        },
-                        footerText: "#" + p.number
-                    });
-                    message.channel.send({ embed });
+                const embed = generatePost({
+                    post: {
+                        number: p.num,
+                        url:
+                            "https://2ch.hk/fag/res/" +
+                            currentThreadD.num +
+                            ".html#" +
+                            p.num,
+                        text: striptags(decode(p.comment), [], " "),
+                        attachment: findAttachmentInPost(p),
+                        date: new Date(p.timestamp * 1000)
+                    },
+                    thread: {
+                        name: currentThreadD.subject,
+                        url:
+                            "https://2ch.hk/fag/res/" +
+                            currentThreadD.num +
+                            ".html"
+                    },
+                    footerText: "#" + p.number
                 });
+                message.channel.send({ embed });
                 break;
         }
     }
