@@ -26,7 +26,7 @@ logger.add(new logger.transports.Console(), {
 logger.level = "debug";
 // Initialize Discord Bot
 var client = new Discord.Client();
-const VERSION = "18.11.2019/1745";
+const VERSION = "18.11.2019/1803";
 var threadChannel = null;
 let linkMap = {};
 
