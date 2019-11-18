@@ -26,6 +26,7 @@ logger.add(new logger.transports.Console(), {
 logger.level = "debug";
 // Initialize Discord Bot
 var client = new Discord.Client();
+const VERSION = "18.11.2019/1745";
 var threadChannel = null;
 let linkMap = {};
 
@@ -222,7 +223,7 @@ client.on("message", async message => {
         console.log("args after", text);
         switch (cmd) {
             case "ping":
-                message.channel.send("Pong!");
+                message.channel.send("Pong! [" + VERSION + "]");
                 break;
             case "infa":
                 if (text) {
