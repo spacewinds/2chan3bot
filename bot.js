@@ -222,7 +222,7 @@ client.on("message", async message => {
         let text = args.join(" ");
         console.log("args after", text);
         switch (cmd) {
-            case "ping":
+            case "_ping":
                 message.channel.send("Pong! [" + VERSION + "]");
                 break;
             case "infa":
