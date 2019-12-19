@@ -17,6 +17,7 @@ import {
     findNewPosts,
     findCurrentThread
 } from "./dvach";
+import { downloadTiktokMeta } from "./tiktok";
 // Configure logger settings
 global.crypto = require("crypto");
 logger.remove(logger.transports.Console);
@@ -211,6 +212,15 @@ const sendNewPosts = () => {
     });
 };
 
+const downloadTiktok = (channel, url) => {
+    downloadTiktokMeta(url, (meta, buffer) => {
+        channel.send(
+            meta.video.description,
+            new Discord.Attachment(buffer, meta.video.id + ".mp4")
+        );
+    });
+};
+
 client.on("voiceStateUpdate", (oldMember, newMember) => {
     const role = oldMember.guild.roles.find("name", "voice");
     if (newMember.voiceChannel) {
@@ -238,6 +248,9 @@ client.on("message", async message => {
                 if (text) {
                     message.channel.send(text + " - " + calculateInfa(text));
                 }
+                break;
+            case "dl":
+                downloadTiktok(message.channel, text);
                 break;
             case "embed":
                 message.channel.send({ embed: exampleEmbed });
