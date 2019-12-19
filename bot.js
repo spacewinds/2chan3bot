@@ -26,7 +26,7 @@ logger.add(new logger.transports.Console(), {
 logger.level = "debug";
 // Initialize Discord Bot
 var client = new Discord.Client();
-const VERSION = "18.11.2019/1803";
+const VERSION = "19.12.2019/1748";
 var threadChannel = null;
 let linkMap = {};
 
@@ -210,6 +210,15 @@ const sendNewPosts = () => {
         }
     });
 };
+
+client.on("voiceStateUpdate", (oldMember, newMember) => {
+    const role = oldMember.guild.roles.find("name", "voice");
+    if (newMember.voiceChannel) {
+        newMember.addRole(role);
+    } else {
+        newMember.removeRole(role);
+    }
+});
 
 client.on("message", async message => {
     console.log("MESSAGE", message.content);
