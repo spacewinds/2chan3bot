@@ -18,13 +18,13 @@ export const getCurrentThreadDesc = () => {
 };
 
 //
-export const findBonbiThreadsSubjects = (listOnly = false, key = "бонби") => {
+export const findBonbiThreadsSubjects = (listOnly = false, key = "бонби", keyAlt = "бoнб") => {
     const cat = getCatalogData();
     let threads = [];
     let list = [];
     if (cat) {
         cat.threads.forEach(item => {
-            if (item.subject.toLowerCase().includes(key)) {
+            if (item.subject.toLowerCase().includes(key) || item.subject.toLowerCase().includes(keyAlt)) {
                 threads.push(item);
                 list.push(item.subject);
             }
