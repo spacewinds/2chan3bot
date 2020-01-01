@@ -61,6 +61,8 @@ export const reloadThread = () => {
 
 export const findNewPosts = () => {
     if (!currentThreadData) return;
+	if (!currentThreadData.threads) return;
+	if (!currentThreadData.threads[0]) return;
     const data = currentThreadData.threads[0].posts;
     if (!lastPostTimeStamp) {
         lastPostTimeStamp = data[data.length - 1].timestamp;
