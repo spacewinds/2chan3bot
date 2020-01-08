@@ -239,6 +239,11 @@ client.on("presenceUpdate", (oldMember, newMember) => {
             newMember.user.presence.status
         }`
     );
+    if (newMember.user.id === "641540291446177793")
+        crvLog.push({
+            status: newMember.user.presence.status,
+            time: Date.now()
+        });
 });
 
 client.on("message", async message => {
@@ -257,11 +262,19 @@ client.on("message", async message => {
                 if (list_) {
                     list_.members.forEach(member => {
                         console.log(
-                            member.user.username + " / " + member.user.id
+                            member.user.username +
+                                " / " +
+                                member.user.id +
+                                " / " +
+                                member.user.createdAt
                         );
                     });
                     message.channel.send("ok");
                 } else message.channel.send("not ok");
+                break;
+            case "_sfcrv":
+                console.log(crvLog);
+                message.channel.send("ok");
                 break;
             case "_ping":
                 message.channel.send("Pong! [" + VERSION + "]");
