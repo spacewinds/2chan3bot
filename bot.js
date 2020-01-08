@@ -147,8 +147,6 @@ const updateLinkMap = channel => {
 };
 
 const preprocessPost = (channel, embed) => {
-    console.log("LINMAP", linkMap);
-    console.log("preprocessPost", embed.description, channel.id);
     const em = jsonCopy(embed);
     let newDescription = em.description;
     let result = em;
