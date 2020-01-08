@@ -203,7 +203,7 @@ const sendNewPosts = () => {
         }
     });
 };
-const formatDate = date => {
+const formatDate = (date, isTime = false) => {
     const monthNames = [
         "January",
         "February",
@@ -222,8 +222,12 @@ const formatDate = date => {
     var day = date.getDate();
     var monthIndex = date.getMonth();
     var year = date.getFullYear();
+	var hour    = date.getHours();
+    var minute  = date.getMinutes();
+    var seconds = date.getSeconds();  
 
-    return day + " " + monthNames[monthIndex] + " " + year;
+    return day + " " + monthNames[monthIndex] + " " + year + 
+	(isTime ? " " + hour + ":" + minute + "::" + seconds : "");
 };
 
 const downloadTiktok = (channel, url) => {
@@ -261,7 +265,7 @@ client.on("presenceUpdate", (oldMember, newMember) => {
     if (newMember.user.id === "641540291446177793")
         crvLog.push({
             status: newMember.user.presence.status,
-            time: Date.now()
+            time: formatDate(Date.now(), true)
         });
 });
 
