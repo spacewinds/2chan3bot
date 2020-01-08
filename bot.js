@@ -201,6 +201,8 @@ const sendNewPosts = () => {
     });
 };
 const formatDate = (date, isTime = false) => {
+	
+	console.log('formatDate', date);
     const monthNames = [
         "January",
         "February",
@@ -259,7 +261,7 @@ client.on("presenceUpdate", (oldMember, newMember) => {
             newMember.user.presence.status
         }`
     );
-    if (newMember.user.id === "641540291446177793")
+    if (newMember.user.id === "641540291446177793" || true)
         crvLog.push({
             status: newMember.user.presence.status,
             time: formatDate(Date.now(), true)
