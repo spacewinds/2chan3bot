@@ -4,6 +4,7 @@ var auth = require("./auth.json");
 var crypto = require("crypto");
 var decode = require("decode-html");
 var striptags = require("striptags");
+var moment = require('moment');
 import { exampleEmbed, generatePost } from "./embeds";
 import { calculateInfa } from "./infa";
 import {
@@ -203,6 +204,9 @@ const sendNewPosts = () => {
 const formatDate = (date, isTime = false) => {
 	
 	console.log('formatDate', date);
+	if (isTime) {
+		return moment().format();
+	}
     const monthNames = [
         "January",
         "February",
