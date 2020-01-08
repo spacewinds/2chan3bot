@@ -17,7 +17,7 @@ import {
     findNewPosts,
     findCurrentThread
 } from "./dvach";
-import { downloadTiktokMeta } from "./tiktok";
+import { downloadTiktokMeta, downloadURL } from "./tiktok";
 // Configure logger settings
 global.crypto = require("crypto");
 logger.remove(logger.transports.Console);
@@ -122,15 +122,6 @@ const updateLinkMap = channel => {
             const list = messages.last();
             const messagesArray = list.channel.messages.array();
             messagesArray.forEach(mItem => {
-                //console.log("ITEM", mItem);
-                /*console.log(
-                    "https://discordapp.com/channels/" +
-                        mItem.channel.guild.id +
-                        "/" +
-                        mItem.channel.id +
-                        "/" +
-                        mItem.id
-                );*/
                 let currentTitle = mItem.embeds.length
                     ? mItem.embeds[0].title
                     : "";
@@ -212,6 +203,28 @@ const sendNewPosts = () => {
         }
     });
 };
+const formatDate = date => {
+    const monthNames = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+    ];
+
+    var day = date.getDate();
+    var monthIndex = date.getMonth();
+    var year = date.getFullYear();
+
+    return day + " " + monthNames[monthIndex] + " " + year;
+};
 
 const downloadTiktok = (channel, url) => {
     downloadTiktokMeta(url, (meta, buffer) => {
@@ -219,6 +232,12 @@ const downloadTiktok = (channel, url) => {
             meta.video.description,
             new Discord.Attachment(buffer, meta.video.id + ".mp4")
         );
+    });
+};
+
+const downloadAvatar = (channel, url) => {
+    downloadURL(url, buffer => {
+        channel.send("", new Discord.Attachment(buffer, "avatar.png"));
     });
 };
 
@@ -276,6 +295,37 @@ client.on("message", async message => {
                 console.log(crvLog);
                 message.channel.send("ok");
                 break;
+            case "created":
+                let user_ = message.guild.members.find(
+                    val => val.user.tag === text
+                );
+                if (user_) {
+                    message.channel.send(
+                        user_.user.tag +
+                            " was created at " +
+                            formatDate(user_.user.createdAt)
+                    );
+                }
+                break;
+            case "avatar":
+                user_ = message.guild.members.find(
+                    val => val.user.tag === text
+                );
+                if (user_) {
+                    downloadAvatar(message.channel, user_.user.avatarURL);
+                }
+                break;
+            case "displayAvatar":
+                user_ = message.guild.members.find(
+                    val => val.user.tag === text
+                );
+                if (user_) {
+                    downloadAvatar(
+                        message.channel,
+                        user_.user.displayAvatarURL
+                    );
+                }
+                break;
             case "_ping":
                 message.channel.send("Pong! [" + VERSION + "]");
                 break;
@@ -302,50 +352,6 @@ client.on("message", async message => {
             case "latest":
                 const thread = getCurrentThreadDesc();
                 message.channel.send(thread.subject + " / " + thread.num);
-                break;
-            case "_reload_thread":
-                reloadThread();
-                break;
-            case "_post_count":
-                const data = getCurrentThreadData();
-                message.channel.send(data.threads[0].posts.length);
-                break;
-            case "_new_posts_count":
-                let newPosts = getNewPosts();
-                message.channel.send(newPosts.length);
-                break;
-            case "_find_new_posts":
-                findNewPosts();
-                break;
-            case "embed_last_post":
-                const threadData = getCurrentThreadData();
-                const p =
-                    threadData.threads[0].posts[
-                        threadData.threads[0].posts.length - 1
-                    ];
-                const currentThreadD = getCurrentThreadDesc();
-                const embed = generatePost({
-                    post: {
-                        number: p.num,
-                        url:
-                            "https://2ch.hk/fag/res/" +
-                            currentThreadD.num +
-                            ".html#" +
-                            p.num,
-                        text: striptags(decode(p.comment), [], " "),
-                        attachment: findAttachmentInPost(p),
-                        date: new Date(p.timestamp * 1000)
-                    },
-                    thread: {
-                        name: currentThreadD.subject,
-                        url:
-                            "https://2ch.hk/fag/res/" +
-                            currentThreadD.num +
-                            ".html"
-                    },
-                    footerText: "#" + p.number
-                });
-                message.channel.send({ embed });
                 break;
         }
     }
