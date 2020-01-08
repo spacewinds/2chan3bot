@@ -140,7 +140,6 @@ const updateLinkMap = channel => {
                     }
                 }
             });
-            console.log("updateLinkMap => ", channel.id, result);
             linkMap[channel.id] = result;
         })
         .catch(console.error);
