@@ -27,9 +27,10 @@ logger.add(new logger.transports.Console(), {
 logger.level = "debug";
 // Initialize Discord Bot
 var client = new Discord.Client();
-const VERSION = "19.12.2019/1748";
+const VERSION = "8.1.2020/1830";
 var threadChannel = null;
 let linkMap = {};
+var crvLog = [];
 
 client.once("ready", () => {
     console.log("Ready!");
@@ -230,6 +231,16 @@ client.on("voiceStateUpdate", (oldMember, newMember) => {
     }
 });
 
+client.on("presenceUpdate", (oldMember, newMember) => {
+    let username = newMember.user.username;
+    let status = newMember.user.presence.status;
+    console.log(
+        `${newMember.user.username} / ${newMember.user.id}  is now ${
+            newMember.user.presence.status
+        }`
+    );
+});
+
 client.on("message", async message => {
     console.log("MESSAGE", message.content);
     const content = message.content;
@@ -241,6 +252,17 @@ client.on("message", async message => {
         let text = args.join(" ");
         console.log("args after", text);
         switch (cmd) {
+            case "_spyfox":
+                const list_ = client.guilds.get("589192369048518723"); //589192369048518723
+                if (list_) {
+                    list_.members.forEach(member => {
+                        console.log(
+                            member.user.username + " / " + member.user.id
+                        );
+                    });
+                    message.channel.send("ok");
+                } else message.channel.send("not ok");
+                break;
             case "_ping":
                 message.channel.send("Pong! [" + VERSION + "]");
                 break;
