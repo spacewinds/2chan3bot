@@ -217,7 +217,7 @@ const formatDate = (date, isTime = false) => {
         "December"
     ];
 
-    var day = date.getDate();
+    var day = date.getDay();
     var monthIndex = date.getMonth();
     var year = date.getFullYear();
 	var hour    = date.getHours();
