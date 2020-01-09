@@ -108,8 +108,8 @@ setInterval(() => {
                         if (member.user.id === "131650829617856512") {
                             member.send(
                                 (active
-                                    ? "Bonbishka is in game!"
-                                    : "Bonbishka is NOT in Game!") +
+                                    ? "Bonbishka is in the game!"
+                                    : "Bonbishka is NOT in the game!") +
                                     " / " +
                                     moment().format("HH:mm:ss")
                             );
