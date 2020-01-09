@@ -265,7 +265,7 @@ client.on("presenceUpdate", (oldMember, newMember) => {
             newMember.user.presence.status
         }`
     );
-    if (newMember.user.id === "641540291446177793") {
+    if (newMember.user.id === "641540291446177793" || true) {
         crvLog.push({
             status: newMember.user.presence.status,
             time: formatDate(Date.now(), true)
