@@ -4,7 +4,7 @@ var auth = require("./auth.json");
 var crypto = require("crypto");
 var decode = require("decode-html");
 var striptags = require("striptags");
-var moment = require('moment');
+var moment = require("moment");
 import { exampleEmbed, generatePost } from "./embeds";
 import { calculateInfa } from "./infa";
 import {
@@ -19,6 +19,7 @@ import {
     findCurrentThread
 } from "./dvach";
 import { downloadTiktokMeta, downloadURL } from "./tiktok";
+import { checkIfUserIsInGame } from "./lol";
 // Configure logger settings
 global.crypto = require("crypto");
 logger.remove(logger.transports.Console);
@@ -28,13 +29,16 @@ logger.add(new logger.transports.Console(), {
 logger.level = "debug";
 // Initialize Discord Bot
 var client = new Discord.Client();
-const VERSION = "8.1.2020/1830";
+const VERSION = "9.1.2020/1459";
 var threadChannel = null;
 let linkMap = {};
 var crvLog = [];
+let bonbiWasInGame = false;
+let isReady = false;
 
 client.once("ready", () => {
     console.log("Ready!");
+    isReady = true;
     reloadCatalog();
 });
 
@@ -89,6 +93,33 @@ setInterval(() => {
         findCurrentThread();
     }, 5000);
 }, 55000);
+
+setInterval(() => {
+    checkIfUserIsInGame("Bonbishka", active => {
+        console.log("checking bonbi's game: ", active);
+        if (client && isReady) {
+            if (bonbiWasInGame !== active) {
+                bonbiWasInGame = active ? true : false;
+
+                const gl = client.guilds.get("589192369048518723");
+                if (gl) {
+                    let user = null;
+                    gl.members.forEach(member => {
+                        if (member.user.id === "131650829617856512") {
+                            member.send(
+                                (active
+                                    ? "Bonbishka is in game!"
+                                    : "Bonbishka is NOT in Game!") +
+                                    " / " +
+                                    moment().format("HH:mm:ss")
+                            );
+                        }
+                    });
+                }
+            }
+        }
+    });
+}, 45000);
 
 setTimeout(() => {
     let channel = client.channels.find("name", "thread");
@@ -202,11 +233,10 @@ const sendNewPosts = () => {
     });
 };
 const formatDate = (date, isTime = false) => {
-	
-	console.log('formatDate', date);
-	if (isTime) {
-		return moment().format();
-	}
+    console.log("formatDate", date);
+    if (isTime) {
+        return moment().format();
+    }
     const monthNames = [
         "January",
         "February",
@@ -225,12 +255,18 @@ const formatDate = (date, isTime = false) => {
     var day = date.getDay();
     var monthIndex = date.getMonth();
     var year = date.getFullYear();
-	var hour    = date.getHours();
-    var minute  = date.getMinutes();
-    var seconds = date.getSeconds();  
+    var hour = date.getHours();
+    var minute = date.getMinutes();
+    var seconds = date.getSeconds();
 
-    return day + " " + monthNames[monthIndex] + " " + year + 
-	(isTime ? " " + hour + ":" + minute + "::" + seconds : "");
+    return (
+        day +
+        " " +
+        monthNames[monthIndex] +
+        " " +
+        year +
+        (isTime ? " " + hour + ":" + minute + "::" + seconds : "")
+    );
 };
 
 const downloadTiktok = (channel, url) => {
@@ -265,22 +301,28 @@ client.on("presenceUpdate", (oldMember, newMember) => {
             newMember.user.presence.status
         }`
     );
-    if (newMember.user.id === "641540291446177793" ) {
+    if (newMember.user.id === "641540291446177793") {
         crvLog.push({
             status: newMember.user.presence.status,
             time: formatDate(Date.now(), true)
         });
-		
-		const gl = client.guilds.get("589192369048518723");
-		if (gl) {
-			let user = null;
-			gl.members.forEach(member => {
-				if (member.user.id === "131650829617856512") {
-					member.send(newMember.user.username + " went " + newMember.user.presence.status + "/ " + moment().format("HH:mm:ss"));
-				}
-			});
-		}
-	}
+
+        const gl = client.guilds.get("589192369048518723");
+        if (gl) {
+            let user = null;
+            gl.members.forEach(member => {
+                if (member.user.id === "131650829617856512") {
+                    member.send(
+                        newMember.user.username +
+                            " went " +
+                            newMember.user.presence.status +
+                            " / " +
+                            moment().format("HH:mm:ss")
+                    );
+                }
+            });
+        }
+    }
 });
 
 client.on("message", async message => {
@@ -294,6 +336,16 @@ client.on("message", async message => {
         let text = args.join(" ");
         console.log("args after", text);
         switch (cmd) {
+            case "lolgame":
+                checkIfUserIsInGame(text, result => {
+                    if (result)
+                        message.channel.send("Player " + text + " is in game!");
+                    else
+                        message.channel.send(
+                            "Player " + text + " is NOT in game!"
+                        );
+                });
+                break;
             case "_spyfox":
                 const list_ = client.guilds.get("589192369048518723"); //589192369048518723
                 if (list_) {
