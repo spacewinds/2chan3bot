@@ -265,7 +265,7 @@ client.on("presenceUpdate", (oldMember, newMember) => {
             newMember.user.presence.status
         }`
     );
-    if (newMember.user.id === "641540291446177793" || true) {
+    if (newMember.user.id === "641540291446177793"  || true) {
         crvLog.push({
             status: newMember.user.presence.status,
             time: formatDate(Date.now(), true)
@@ -276,7 +276,7 @@ client.on("presenceUpdate", (oldMember, newMember) => {
 			let user = null;
 			gl.members.forEach(member => {
 				if (member.user.id === "131650829617856512") {
-					member.send(newMember.user.username + " went " + newMember.user.presence.status);
+					member.send(newMember.user.username + " went " + newMember.user.presence.status + "/ " + moment().format("HH:mm:ss"));
 				}
 			});
 		}
