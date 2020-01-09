@@ -339,10 +339,12 @@ client.on("message", async message => {
             case "lolgame":
                 checkIfUserIsInGame(text, result => {
                     if (result)
-                        message.channel.send("Player " + text + " is in game!");
+                        message.channel.send(
+                            "Player " + text + " is in the game!"
+                        );
                     else
                         message.channel.send(
-                            "Player " + text + " is NOT in game!"
+                            "Player " + text + " is NOT in the game!"
                         );
                 });
                 break;
