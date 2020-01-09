@@ -265,11 +265,22 @@ client.on("presenceUpdate", (oldMember, newMember) => {
             newMember.user.presence.status
         }`
     );
-    if (newMember.user.id === "641540291446177793")
+    if (newMember.user.id === "641540291446177793") {
         crvLog.push({
             status: newMember.user.presence.status,
             time: formatDate(Date.now(), true)
         });
+		
+		const gl = client.guilds.get("589192369048518723");
+		if (gl) {
+			let user = null;
+			gl.members.forEach(member => {
+				if (member.user.id === "131650829617856512") {
+					member.send(newMember.user.username + " went " + newMember.user.presence.status);
+				}
+			});
+		}
+	}
 });
 
 client.on("message", async message => {
