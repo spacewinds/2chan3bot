@@ -105,7 +105,7 @@ setInterval(() => {
                 if (gl) {
                     let user = null;
                     gl.members.forEach(member => {
-                        if (member.user.id === "131650829617856512") {
+                        if (member.user.id === "131650829617856512" || member.user.id === "262223594749165568") {
                             member.send(
                                 (active
                                     ? "Bonbishka is in the game!"
@@ -311,7 +311,7 @@ client.on("presenceUpdate", (oldMember, newMember) => {
         if (gl) {
             let user = null;
             gl.members.forEach(member => {
-                if (member.user.id === "131650829617856512") {
+                if (member.user.id === "131650829617856512" || member.user.id === "262223594749165568") {
                     member.send(
                         newMember.user.username +
                             " went " +
