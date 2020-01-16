@@ -94,6 +94,7 @@ setInterval(() => {
     }, 5000);
 }, 55000);
 
+/*
 setInterval(() => {
     checkIfUserIsInGame("Bonbishka", active => {
         console.log("checking bonbi's game: ", active);
@@ -119,7 +120,7 @@ setInterval(() => {
             }
         }
     });
-}, 45000);
+}, 45000);*/
 
 setTimeout(() => {
     let channel = client.channels.find("name", "thread");
@@ -301,6 +302,8 @@ client.on("presenceUpdate", (oldMember, newMember) => {
             newMember.user.presence.status
         }`
     );
+	
+	/*
     if (newMember.user.id === "641540291446177793") {
         crvLog.push({
             status: newMember.user.presence.status,
@@ -322,7 +325,7 @@ client.on("presenceUpdate", (oldMember, newMember) => {
                 }
             });
         }
-    }
+    }*/
 });
 
 client.on("message", async message => {
