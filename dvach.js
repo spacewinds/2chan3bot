@@ -18,13 +18,20 @@ export const getCurrentThreadDesc = () => {
 };
 
 //
-export const findBonbiThreadsSubjects = (listOnly = false, key = "бонби", keyAlt = "бoнб") => {
+export const findBonbiThreadsSubjects = (
+    listOnly = false,
+    key = "бонби",
+    keyAlt = "бoнб"
+) => {
     const cat = getCatalogData();
     let threads = [];
     let list = [];
     if (cat) {
         cat.threads.forEach(item => {
-            if (item.subject.toLowerCase().includes(key) || item.subject.toLowerCase().includes(keyAlt)) {
+            if (
+                item.subject.toLowerCase().includes(key) ||
+                item.subject.toLowerCase().includes(keyAlt)
+            ) {
                 threads.push(item);
                 list.push(item.subject);
             }
@@ -48,7 +55,7 @@ export const reloadThread = () => {
             .get("https://2ch.hk/fag/res/" + currentThreadDesc.num + ".json")
             .then(function(response) {
                 currentThreadData = response.data;
-                console.log("reload thread success");
+                //console.log("reload thread success");
             })
             .catch(function(error) {
                 // handle error
@@ -61,8 +68,8 @@ export const reloadThread = () => {
 
 export const findNewPosts = () => {
     if (!currentThreadData) return;
-	if (!currentThreadData.threads) return;
-	if (!currentThreadData.threads[0]) return;
+    if (!currentThreadData.threads) return;
+    if (!currentThreadData.threads[0]) return;
     const data = currentThreadData.threads[0].posts;
     if (!lastPostTimeStamp) {
         lastPostTimeStamp = data[data.length - 1].timestamp;

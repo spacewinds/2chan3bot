@@ -71,7 +71,7 @@ function decodeHtmlCharCodes(str) {
 }
 
 setInterval(() => {
-    console.log("updating");
+    //console.log("updating");
     reloadThread();
     getCurrentThreadDesc();
 }, 10000);
@@ -87,7 +87,7 @@ setTimeout(() => {
 }, 5000);
 
 setInterval(() => {
-    console.log("updating catalog");
+    //console.log("updating catalog");
     reloadCatalog();
     setTimeout(() => {
         findCurrentThread();
@@ -132,7 +132,7 @@ setTimeout(() => {
             updateLinkMap(item);
         }
     });
-    console.log("CHANNELS!!!", result.length);
+    //console.log("CHANNELS!!!", result.length);
     if (channel) threadChannel = result;
     //console.log("WORKING CHANNEL", threadChannel);
     console.log("clientid", client.user.id);
@@ -147,11 +147,6 @@ const updateLinkMap = channel => {
     channel
         .fetchMessages()
         .then(messages => {
-            console.log(
-                `${
-                    messages.filter(m => m.author.id === client.user.id).size
-                } messages`
-            );
             const list = messages.last();
             const messagesArray = list.channel.messages.array();
             messagesArray.forEach(mItem => {
@@ -187,7 +182,6 @@ const preprocessPost = (channel, embed) => {
         if (item.substring(0, 8).includes(">>")) {
             let id = item.replace(">>", "");
             if (linkMap[channel.id] && linkMap[channel.id]["#" + id]) {
-                console.log("found in history");
                 newDescription = newDescription.replace(
                     item,
                     "[" + item + "](" + linkMap[channel.id]["#" + id] + ")"
@@ -234,7 +228,6 @@ const sendNewPosts = () => {
     });
 };
 const formatDate = (date, isTime = false) => {
-    console.log("formatDate", date);
     if (isTime) {
         return moment().format();
     }
@@ -302,8 +295,8 @@ client.on("presenceUpdate", (oldMember, newMember) => {
             newMember.user.presence.status
         }`
     );
-	
-	/*
+
+    /*
     if (newMember.user.id === "641540291446177793") {
         crvLog.push({
             status: newMember.user.presence.status,
@@ -329,7 +322,7 @@ client.on("presenceUpdate", (oldMember, newMember) => {
 });
 
 client.on("message", async message => {
-    console.log("MESSAGE", message.content);
+    console.log("MESSAGE", message.author.tag, message.content);
     const content = message.content;
     if (content.substring(0, 1) == "-") {
         var args = content.substring(1).split(" ");
