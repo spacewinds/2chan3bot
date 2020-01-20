@@ -143,7 +143,7 @@ const jsonCopy = src => {
 
 const putMain = text => {
     client.channels.forEach(channel => {
-        if (channel.name === "main") {
+        if (channel.name === "general") {
             channel.send(text);
         }
     });
@@ -345,6 +345,12 @@ client.on("message", async message => {
         switch (cmd) {
             case "putmain":
                 putMain(text);
+                break;
+            case "users":
+                const list_ = client.guilds.get("589192369048518723"); //589192369048518723
+                list_.members.forEach(member => {
+                    console.log(member.user.username + " / " + member.user.id);
+                });
                 break;
             case "lolgame":
                 checkIfUserIsInGame(text, result => {
