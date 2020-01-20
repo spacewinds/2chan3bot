@@ -347,8 +347,8 @@ client.on("message", async message => {
                 putMain(text);
                 break;
             case "users":
-                const list_ = client.guilds.get("589192369048518723"); //589192369048518723
-                list_.members.forEach(member => {
+                const list__ = client.guilds.get("589192369048518723"); //589192369048518723
+                list__.members.forEach(member => {
                     console.log(member.user.username + " / " + member.user.id);
                 });
                 break;
