@@ -45,7 +45,6 @@ client.once("ready", () => {
 //client.login(auth.token);
 client.login(process.env.BOT_TOKEN);
 const findAttachmentInPost = post => {
-    console.log("ATTACHMENT", post);
     let result = undefined;
     if (post.files && post.files.length > 0) {
         post.files.forEach(item => {
@@ -140,6 +139,14 @@ setTimeout(() => {
 
 const jsonCopy = src => {
     return JSON.parse(JSON.stringify(src));
+};
+
+const putMain = text => {
+    client.channels.forEach(channel => {
+        if (channel.name === "main") {
+            channel.send(text);
+        }
+    });
 };
 
 const updateLinkMap = channel => {
@@ -290,11 +297,12 @@ client.on("voiceStateUpdate", (oldMember, newMember) => {
 client.on("presenceUpdate", (oldMember, newMember) => {
     let username = newMember.user.username;
     let status = newMember.user.presence.status;
+    /*
     console.log(
         `${newMember.user.username} / ${newMember.user.id}  is now ${
             newMember.user.presence.status
         }`
-    );
+    );*/
 
     /*
     if (newMember.user.id === "641540291446177793") {
@@ -322,16 +330,22 @@ client.on("presenceUpdate", (oldMember, newMember) => {
 });
 
 client.on("message", async message => {
-    console.log("MESSAGE", message.author.tag, message.content);
+    console.log(
+        "MESSAGE",
+        message.channel.name,
+        message.author.tag,
+        message.content
+    );
     const content = message.content;
     if (content.substring(0, 1) == "-") {
         var args = content.substring(1).split(" ");
         var cmd = args[0];
-        console.log("args before", args);
         args = args.splice(1);
         let text = args.join(" ");
-        console.log("args after", text);
         switch (cmd) {
+            case "putmain":
+                putMain(text);
+                break;
             case "lolgame":
                 checkIfUserIsInGame(text, result => {
                     if (result)

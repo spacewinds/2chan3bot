@@ -39,6 +39,6 @@ export const generatePost = data => {
             url: "https://ya.ru"
         }
     };
-    console.log("result", result);
+    //console.log("result", result);
     return result;
 };
