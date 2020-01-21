@@ -482,6 +482,12 @@ client.on("message", async message => {
                     createRoundAvatar(message.channel, user_.user.avatarURL);
                 }
                 break;
+            case "lukoshko1":
+                user_ = client.users.find(val => val.tag === text);
+                if (user_) {
+                    createRoundAvatar(message.channel, user_.avatarURL);
+                }
+                break;
             case "_ping":
                 message.channel.send("Pong! [" + VERSION + "]");
                 break;
