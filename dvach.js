@@ -27,15 +27,16 @@ export const findBonbiThreadsSubjects = (
     let threads = [];
     let list = [];
     if (cat) {
-        cat.threads.forEach(item => {
-            if (
-                item.subject.toLowerCase().includes(key) ||
-                item.subject.toLowerCase().includes(keyAlt)
-            ) {
-                threads.push(item);
-                list.push(item.subject);
-            }
-        });
+        if (cat.threads)
+            cat.threads.forEach(item => {
+                if (
+                    item.subject.toLowerCase().includes(key) ||
+                    item.subject.toLowerCase().includes(keyAlt)
+                ) {
+                    threads.push(item);
+                    list.push(item.subject);
+                }
+            });
     }
     return listOnly ? list : threads;
 };
