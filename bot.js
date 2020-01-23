@@ -396,7 +396,7 @@ const sendToGhoul = (channel, tag, content, enabled = true) => {
             let user = null;
             gl.members.forEach(member => {
                 if (member.user.id === "666633875140902912") {
-                    member.send("MESSAGE" + channel + tag + content);
+                    member.send(channel + " " + tag + " " + content);
                 }
             });
         }
