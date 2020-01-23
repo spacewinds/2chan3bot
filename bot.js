@@ -404,7 +404,8 @@ const sendToGhoul = (channel, tag, content, enabled = true) => {
 };
 
 client.on("message", async message => {
-    sendToGhoul(message.channel.name, message.author.tag, message.content);
+    if (message.author.id !== "644461857591263263")
+        sendToGhoul(message.channel.name, message.author.tag, message.content);
 
     console.log(
         "MESSAGE",
