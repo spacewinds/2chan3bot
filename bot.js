@@ -432,7 +432,7 @@ client.on("message", async message => {
         let text = args.join(" ");
         switch (cmd) {
             case "prunedry":
-                prune(message.guild, args[0]);
+                prune(message.channel, message.guild, args[0]);
                 break;
             case "putmain":
                 putMain(text);
