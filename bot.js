@@ -160,6 +160,15 @@ const prune = (channel, guild, days, dry = true) => {
         .catch(console.error);
 };
 
+const forward = args => {
+    const list_ = client.guilds.get("589192369048518723"); //589192369048518723
+    list_.members.forEach(member => {
+        if (member.user.tag === args[0]) {
+            member.send(args[1]);
+        }
+    });
+};
+
 const updateLinkMap = channel => {
     let result = {};
     channel
@@ -280,8 +289,6 @@ const formatDate = (date, isTime = false) => {
         (isTime ? " " + hour + ":" + minute + "::" + seconds : "")
     );
 };
-
-//qprRUMQQQ321
 const downloadTiktok = (channel, url) => {
     downloadTiktokMeta(url, (meta, buffer) => {
         channel.send(
@@ -434,6 +441,8 @@ client.on("message", async message => {
             case "prunedry":
                 prune(message.channel, message.guild, args[0]);
                 break;
+            case "forward":
+                forward(text.split(" > "));
             case "putmain":
                 putMain(text);
                 break;
