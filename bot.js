@@ -150,6 +150,16 @@ const putMain = text => {
     });
 };
 
+const prune = (channel, guild, days, dry = true) => {
+    guild
+        .pruneMembers(parseInt(days), true)
+        .then(pruned => {
+            channel.send(`This will prune ${pruned} people!`);
+            console.log(`This will prune ${pruned} people!`);
+        })
+        .catch(console.error);
+};
+
 const updateLinkMap = channel => {
     let result = {};
     channel
@@ -271,6 +281,7 @@ const formatDate = (date, isTime = false) => {
     );
 };
 
+//qprRUMQQQ321
 const downloadTiktok = (channel, url) => {
     downloadTiktokMeta(url, (meta, buffer) => {
         channel.send(
@@ -420,6 +431,9 @@ client.on("message", async message => {
         args = args.splice(1);
         let text = args.join(" ");
         switch (cmd) {
+            case "prunedry":
+                prune(message.guild, args[0]);
+                break;
             case "putmain":
                 putMain(text);
                 break;
