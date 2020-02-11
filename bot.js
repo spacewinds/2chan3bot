@@ -443,6 +443,7 @@ client.on("message", async message => {
                 break;
             case "forward":
                 forward(text.split(" > "));
+                break;
             case "putmain":
                 putMain(text);
                 break;
