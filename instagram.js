@@ -1,6 +1,6 @@
 const axios = require("axios");
 
-export const getUserStories = (username, onReady) => {
+export const getUserStories = (username, onReady, repeat = 3) => {
     const pk = null;
     axios
         .get("https://instagram.com/" + username + "/?__a=1")
@@ -20,7 +20,7 @@ export const getUserStories = (username, onReady) => {
                                 origin: "https://insta-stories.ru",
                                 referer: "https://insta-stories.ru/" + username
                             },
-                            timeout: 4000
+                            timeout: 5000
                         }
                     )
                     .then(function(stories_data) {
@@ -28,7 +28,8 @@ export const getUserStories = (username, onReady) => {
                     })
                     .catch(function(st_error) {
                         console.log("stError", st_error);
-                        getUserStories(username, onReady);
+                        if (repeat > 0)
+                            getUserStories(username, onReady, repeat - 1);
                     });
 
                 //onReady({ id: info.graphql.user.id });
