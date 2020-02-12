@@ -19,7 +19,8 @@ export const getUserStories = (username, onReady) => {
                             headers: {
                                 origin: "https://insta-stories.ru",
                                 referer: "https://insta-stories.ru/" + username
-                            }
+                            },
+                            timeout: 4000
                         }
                     )
                     .then(function(stories_data) {
@@ -27,6 +28,7 @@ export const getUserStories = (username, onReady) => {
                     })
                     .catch(function(st_error) {
                         console.log("stError", st_error);
+                        getUserStories(username, onReady);
                     });
 
                 //onReady({ id: info.graphql.user.id });
