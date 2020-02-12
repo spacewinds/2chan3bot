@@ -20,6 +20,7 @@ import {
     findCurrentThread
 } from "./dvach";
 import { downloadTiktokMeta, downloadURL } from "./tiktok";
+import { getUserStories } from "./instagram";
 import { checkIfUserIsInGame } from "./lol";
 // Configure logger settings
 global.crypto = require("crypto");
@@ -421,6 +422,30 @@ const sendToGhoul = (channel, tag, content, enabled = true) => {
     }
 };
 
+const getStories = (channel, username) => {
+    getUserStories(username, data => {
+        console.log("data", data);
+        if (data.stories) {
+            data.stories.forEach(story => {
+                if (story.img) {
+                    channel.send(
+                        "",
+                        new Discord.Attachment(story.img, story.id + ".jpg")
+                    );
+                } else if (story.video) {
+                    channel.send(
+                        "",
+                        new Discord.Attachment(
+                            story.video.url,
+                            story.id + ".mp4"
+                        )
+                    );
+                }
+            });
+        }
+    });
+};
+
 client.on("message", async message => {
     if (message.author.id !== "644461857591263263")
         sendToGhoul(message.channel.name, message.author.tag, message.content);
@@ -438,6 +463,9 @@ client.on("message", async message => {
         args = args.splice(1);
         let text = args.join(" ");
         switch (cmd) {
+            case "stories":
+                getStories(message.channel, args[0]);
+                break;
             case "prunedry":
                 prune(message.channel, message.guild, args[0]);
                 break;
