@@ -114,7 +114,7 @@ const scrapWorker = (username, channelName, timeout = 60000) => {
                         result.collector.length > 0
                     ) {
                         if (
-                            result.collector[0].createTime >=
+                            result.collector[0].createTime >
                             scrap[username].collector[0].createTime
                         ) {
                             const video = result.collector[0];
