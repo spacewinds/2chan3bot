@@ -19,7 +19,12 @@ import {
     findNewPosts,
     findCurrentThread
 } from "./dvach";
-import { downloadTiktokMeta, downloadURL } from "./tiktok";
+import {
+    downloadTiktokMeta,
+    downloadURL,
+    scrapUser,
+    randomPost
+} from "./tiktok";
 import { getUserStories } from "./instagram";
 import { checkIfUserIsInGame } from "./lol";
 // Configure logger settings
@@ -37,6 +42,7 @@ let linkMap = {};
 var crvLog = [];
 let bonbiWasInGame = false;
 let isReady = false;
+let scrap = {};
 
 client.once("ready", () => {
     console.log("Ready!");
@@ -94,6 +100,56 @@ setInterval(() => {
         findCurrentThread();
     }, 5000);
 }, 55000);
+
+const scrapWorker = (username, channelName, timeout = 60000) => {
+    setInterval(() => {
+        console.log("scraping " + username);
+        scrapUser(username, (success, result) => {
+            if (success) {
+                if (scrap[username]) {
+                    if (
+                        scrap[username].collector &&
+                        scrap[username].collector.length > 0 &&
+                        result.collector &&
+                        result.collector.length > 0
+                    ) {
+                        if (
+                            result.collector[0].createTime >=
+                            scrap[username].collector[0].createTime
+                        ) {
+                            const video = result.collector[0];
+                            const link =
+                                "https://www.tiktok.com/@" +
+                                username +
+                                "/video/" +
+                                video.id;
+
+                            downloadTiktokMeta(link, (meta, buffer) => {
+                                client.channels.forEach(item => {
+                                    if (item.name === channelName) {
+                                        item.send(
+                                            meta.video.description,
+                                            new Discord.Attachment(
+                                                buffer,
+                                                meta.video.id + ".mp4"
+                                            )
+                                        );
+                                    }
+                                });
+                            });
+                        }
+                    }
+                }
+
+                scrap[username] = result;
+            } else {
+                console.log("Scrapping failed! " + result);
+            }
+        });
+    }, timeout);
+};
+
+scrapWorker("bonbibonkers", "bonbi-new-stuff", 90000);
 
 /*
 setInterval(() => {
@@ -446,6 +502,55 @@ const getStories = (channel, username) => {
     });
 };
 
+const scrapf = (channel, username) => {
+    scrapUser(username, (success, result) => {
+        if (success) {
+            scrap[username] = result;
+            channel.send(
+                "Scrapped " +
+                    username +
+                    " successfully! [" +
+                    result.collector.length +
+                    "]"
+            );
+        } else {
+            channel.send("Scrapping failed" + result);
+        }
+    });
+};
+
+const randomTTPost = (channel, username) => {
+    if (scrap[username]) {
+        randomPost(scrap[username], username, (meta, buffer) => {
+            channel.send(
+                meta.video.description,
+                new Discord.Attachment(buffer, meta.video.id + ".mp4")
+            );
+        });
+    } else {
+        channel.send("user " + username + " is not scrapped yet");
+    }
+};
+
+const processLink = (channel, text) => {
+    console.log("text", text);
+    let regex = /(https?:\/\/[^\s]+)/g;
+    let link;
+
+    let result = false;
+    while ((link = regex.exec(text)) !== null) {
+        const value = link[0];
+        if (
+            value.includes("https://www.tiktok.com/") ||
+            value.includes("https://vm.tiktok.com/")
+        ) {
+            downloadTiktok(channel, value);
+            result = false;
+        }
+    }
+    return result;
+};
+
 client.on("message", async message => {
     if (message.author.id !== "644461857591263263")
         sendToGhoul(message.channel.name, message.author.tag, message.content);
@@ -457,12 +562,22 @@ client.on("message", async message => {
         message.content
     );
     const content = message.content;
+    if (processLink(message.channel, content)) return;
     if (content.substring(0, 1) == "-") {
         var args = content.substring(1).split(" ");
         var cmd = args[0];
         args = args.splice(1);
         let text = args.join(" ");
         switch (cmd) {
+            case "enableScrapWorker":
+                scrapWorker(args[0], args[1]);
+                break;
+            case "rp":
+                randomTTPost(message.channel, text);
+                break;
+            case "scrap":
+                scrapf(message.channel, text);
+                break;
             case "stories":
                 getStories(message.channel, args[0]);
                 break;
@@ -564,9 +679,6 @@ client.on("message", async message => {
                 if (text) {
                     message.channel.send(text + " - " + calculateInfa(text));
                 }
-                break;
-            case "dl":
-                downloadTiktok(message.channel, text);
                 break;
             case "embed":
                 message.channel.send({ embed: exampleEmbed });
