@@ -36,7 +36,7 @@ logger.add(new logger.transports.Console(), {
 logger.level = "debug";
 // Initialize Discord Bot
 var client = new Discord.Client();
-const VERSION = "9.1.2020/1459";
+const VERSION = "6.3.2020/1752";
 var threadChannel = null;
 let linkMap = {};
 var crvLog = [];
