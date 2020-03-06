@@ -14,5 +14,5 @@ export const calculateInfa = text => {
         hash = parseInt(hash * 100);
     }
     console.log("hash was " + hash);
-    return "инфа " + hash + "%";
+    return "infa " + hash + "%";
 };
