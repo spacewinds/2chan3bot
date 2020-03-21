@@ -150,6 +150,7 @@ const scrapWorker = (username, channelName, timeout = 60000) => {
 };
 
 scrapWorker("bonbibonkers", "bonbi-new-stuff", 90000);
+scrapWorker("bonbibonkers", "new-bonbi-stuff", 120000);
 
 /*
 setInterval(() => {
@@ -512,21 +513,25 @@ const getStories = (channel, username) => {
     });
 };
 
-const scrapf = (channel, username) => {
-    scrapUser(username, (success, result) => {
-        if (success) {
-            scrap[username] = result;
-            channel.send(
-                "Scrapped " +
-                    username +
-                    " successfully! [" +
-                    result.collector.length +
-                    "]"
-            );
-        } else {
-            channel.send("Scrapping failed" + result);
-        }
-    });
+const scrapf = (channel, username, count) => {
+    scrapUser(
+        username,
+        (success, result) => {
+            if (success) {
+                scrap[username] = result;
+                channel.send(
+                    "Scrapped " +
+                        username +
+                        " successfully! [" +
+                        result.collector.length +
+                        "]"
+                );
+            } else {
+                channel.send("Scrapping failed" + result);
+            }
+        },
+        count
+    );
 };
 
 const randomTTPost = (channel, username) => {
@@ -586,7 +591,11 @@ client.on("message", async message => {
                 randomTTPost(message.channel, text);
                 break;
             case "scrap":
-                scrapf(message.channel, text);
+                scrapf(
+                    message.channel,
+                    args[0],
+                    args.length > 1 ? args[1] : undefined
+                );
                 break;
             case "stories":
                 getStories(message.channel, args[0]);
