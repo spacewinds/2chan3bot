@@ -42,13 +42,14 @@ export const extractIdFromUrl = (url, onReady) => {
 };
 
 export const loadMetaInfo = (id, onReady) => {
+    console.log("ID", id);
     let headers = {
         Host: "api2-16-h2.musical.ly",
         Cookie:
             "odin_tt=504c787a61626247744d5373374f5966545e20c97e200df2c6babbf3e0b2a379cf111d0d8b56356def2e4e85159b0de3c4849158780db48d2d355c4255db2544; sid_guard=52c010a5dc1f4de4f97daf216654be70%7C1581615193%7C5184000%7CMon%2C+13-Apr-2020+17%3A33%3A13+GMT; uid_tt=7d64f61fb376e98ed49b99cfa57c7289370085be18a53913760e7ca8d9e6cd4f; uid_tt_ss=7d64f61fb376e98ed49b99cfa57c7289370085be18a53913760e7ca8d9e6cd4f; sid_tt=52c010a5dc1f4de4f97daf216654be70; sessionid=52c010a5dc1f4de4f97daf216654be70; sessionid_ss=52c010a5dc1f4de4f97daf216654be70; install_id=6792985469456271110; ttreq=1$5606c847b8602aee910c0cefa5beb9350978f309"
     };
     headers["x-tt-token"] =
-        "0352c010a5dc1f4de4f97daf216654be706d633d154c0d2ba9254a2e02ea3aecbd4b847458509bfe32bf5a924626232fb017";
+        "0352c010a5dc1f4de4f97daf216654be708317d6694edf0c4f660e86a685b0a147c4d3596cf2a6a38eb849694e34cd8e8421";
     headers["sdk-version"] = "1";
     headers["x-tt-trace-id"] =
         "00-c8e9a425105b138cfb78c346060404d1-c8e9a425105b138c-01";
@@ -64,8 +65,8 @@ export const loadMetaInfo = (id, onReady) => {
     axios
         .get(url, { headers })
         .then(response => {
-            console.log(response.data);
-            onReady(response.data);
+            console.log("META DATA", response.data);
+            if (onReady) onReady(response.data);
         })
         .catch(error => {
             console.log("META ERROR", error);

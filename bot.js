@@ -23,7 +23,8 @@ import {
     downloadTiktokMeta,
     downloadURL,
     scrapUser,
-    randomPost
+    randomPost,
+    loadMetaInfo
 } from "./tiktok";
 import { getUserStories } from "./instagram";
 import { checkIfUserIsInGame } from "./lol";
@@ -592,6 +593,8 @@ client.on("message", async message => {
         args = args.splice(1);
         let text = args.join(" ");
         switch (cmd) {
+            case "meta":
+                loadMetaInfo(args[0]);
             case "enableScrapeWorker":
                 scrapWorker(args[0], args[1]);
                 break;
