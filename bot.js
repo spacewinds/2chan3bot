@@ -593,7 +593,7 @@ client.on("message", async message => {
             case "rp":
                 randomTTPost(message.channel, text);
                 break;
-            case "scrap":
+            case "scrape":
                 scrapf(
                     message.channel,
                     args[0],
