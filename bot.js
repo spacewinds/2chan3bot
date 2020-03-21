@@ -549,6 +549,9 @@ const randomTTPost = (channel, username) => {
 
 const processLink = (channel, text) => {
     console.log("text", text);
+    if (text.includes("'tt")) {
+        return;
+    }
     let regex = /(https?:\/\/[^\s]+)/g;
     let link;
 

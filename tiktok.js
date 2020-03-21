@@ -103,7 +103,7 @@ export const downloadTiktokHD = (url, onReady) => {
     });
 };
 
-export const scrapUser = async (user, onReady, maxPosts = 100) => {
+export const scrapUser = async (user, onReady, maxPosts = 150) => {
     try {
         const posts = await TikTokScraper.user(user, {
             number: maxPosts
