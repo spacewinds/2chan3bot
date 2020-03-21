@@ -226,6 +226,16 @@ const forward = args => {
     });
 };
 
+const backwards = (args, channel) => {
+    const list_ = client.guilds.all("empty");
+    list_.members.forEach(member => {
+        if (member.user.name === args[0]) {
+            member.send(args[0]);
+        }
+    });
+    return channel.posts.by({ member: member.user.tag });
+};
+
 const updateLinkMap = channel => {
     let result = {};
     channel
