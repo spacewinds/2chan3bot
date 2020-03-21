@@ -43,6 +43,7 @@ var crvLog = [];
 let bonbiWasInGame = false;
 let isReady = false;
 let scrap = {};
+let scrapW = {};
 
 client.once("ready", () => {
     console.log("Ready!");
@@ -104,53 +105,57 @@ setInterval(() => {
 const scrapWorker = (username, channelName, timeout = 60000) => {
     setInterval(() => {
         console.log("scraping " + username);
-        scrapUser(username, (success, result) => {
-            if (success) {
-                if (scrap[username]) {
-                    if (
-                        scrap[username].collector &&
-                        scrap[username].collector.length > 0 &&
-                        result.collector &&
-                        result.collector.length > 0
-                    ) {
+        scrapUser(
+            username,
+            (success, result) => {
+                if (success) {
+                    if (scrapW[username]) {
                         if (
-                            result.collector[0].createTime >
-                            scrap[username].collector[0].createTime
+                            scrapW[username].collector &&
+                            scrapW[username].collector.length > 0 &&
+                            result.collector &&
+                            result.collector.length > 0
                         ) {
-                            const video = result.collector[0];
-                            const link =
-                                "https://www.tiktok.com/@" +
-                                username +
-                                "/video/" +
-                                video.id;
+                            if (
+                                result.collector[0].createTime >
+                                scrapW[username].collector[0].createTime
+                            ) {
+                                const video = result.collector[0];
+                                const link =
+                                    "https://www.tiktok.com/@" +
+                                    username +
+                                    "/video/" +
+                                    video.id;
 
-                            downloadTiktokMeta(link, (meta, buffer) => {
-                                client.channels.forEach(item => {
-                                    if (item.name === channelName) {
-                                        item.send(
-                                            meta.video.description,
-                                            new Discord.Attachment(
-                                                buffer,
-                                                meta.video.id + ".mp4"
-                                            )
-                                        );
-                                    }
+                                downloadTiktokMeta(link, (meta, buffer) => {
+                                    client.channels.forEach(item => {
+                                        if (item.name === channelName) {
+                                            item.send(
+                                                meta.video.description,
+                                                new Discord.Attachment(
+                                                    buffer,
+                                                    meta.video.id + ".mp4"
+                                                )
+                                            );
+                                        }
+                                    });
                                 });
-                            });
+                            }
                         }
                     }
-                }
 
-                scrap[username] = result;
-            } else {
-                console.log("Scrapping failed! " + result);
-            }
-        });
+                    scrapW[username] = result;
+                } else {
+                    console.log("Scrapping failed! " + result);
+                }
+            },
+            25
+        );
     }, timeout);
 };
 
 scrapWorker("bonbibonkers", "bonbi-new-stuff", 90000);
-scrapWorker("bonbibonkers", "new-bonbi-stuff", 120000);
+scrapWorker("bonbibonkers", "new-bonbi-stuff", 90000);
 
 /*
 setInterval(() => {
@@ -587,7 +592,7 @@ client.on("message", async message => {
         args = args.splice(1);
         let text = args.join(" ");
         switch (cmd) {
-            case "enableScrapWorker":
+            case "enableScrapeWorker":
                 scrapWorker(args[0], args[1]);
                 break;
             case "rp":
