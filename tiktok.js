@@ -11,21 +11,32 @@ const randomInt = max => {
 };
 
 export const extractIdFromUrl = (url, onReady) => {
-    const short = "https://vm.tiktok.com/srFfyy/";
-    const long =
-        "https://www.tiktok.com/@kizunaai0630/video/6799 2608 5224 4598 018";
-
     if (url.includes("vm.tiktok.com/")) {
         axios
             .get(url)
             .then(response => {
                 const data = response.request.path;
-                //console.log("url data", response.request.path);
+                console.log("url data", response);
                 const idx = data.indexOf(".html?u_code");
                 if (idx >= 0) {
                     const result = data.slice(3, 3 + 19);
-                    console.log("result", result);
-                    onReady(result);
+                    axios
+                        .get(response.request.res.responseUrl, {
+                            headers: {
+                                "user-agent":
+                                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36",
+                                "sec-fetch-mode": "navigate"
+                            }
+                        })
+                        .then(rsp => {
+                            extractIdFromUrl(
+                                rsp.request.res.responseUrl,
+                                onReady
+                            );
+                        });
+
+                    //console.log("result", result);
+                    //onReady(result);
                 }
             })
             .catch(error => {
@@ -33,11 +44,17 @@ export const extractIdFromUrl = (url, onReady) => {
             });
     } else if (url.includes("www.tiktok.com/")) {
         const idx = url.indexOf("/video/");
+        const idxA = url.indexOf("@");
+        let result = { videoId: "", userName: "" };
+
         if (idx >= 0) {
-            const result = url.slice(idx + 7, idx + 8 + 19);
-            //console.log("result", result);
-            onReady(result);
+            result.videoId = url.slice(idx + 7, idx + 8 + 19);
         }
+        if (idxA >= 0) {
+            result.userName = url.slice(idxA + 1, idx);
+        }
+        console.log("RESULT", result);
+        onReady(result);
     }
 };
 
@@ -104,13 +121,15 @@ export const downloadTiktokHD = (url, onReady) => {
     });
 };
 
-export const scrapUser = async (user, onReady, maxPosts = 150) => {
+export const scrapUser = async (user, onReady, maxPosts = 100) => {
+    console.log("scrapUser params", user, onReady, maxPosts);
     try {
         const posts = await TikTokScraper.user(user, {
             number: maxPosts
         });
         onReady(true, posts);
     } catch (error) {
+        console.log("scrap error?", error);
         onReady(false, error.toString());
     }
 };
@@ -206,8 +225,87 @@ export const downloadTiktokMeta = (url, onReady) => {
                 }
             })
             .catch(function(error) {
-                // handle error
+                downloadTiktokEmergencyMode(url, onReady);
                 console.log(error);
             });
     }
+};
+
+export const downloadTiktokEmergencyMode = (url, onReady) => {
+    console.log("downloading in emergency mode");
+    extractIdFromUrl(url, config => {
+        console.log("CONFIG", config);
+
+        scrapUser(
+            config.userName,
+            (success, result) => {
+                if (success) {
+                    let i = 0;
+                    for (i = 0; i < result.collector.length; i++) {
+                        const item = result.collector[i];
+                        if (item.id === config.videoId) {
+                            axios
+                                .get(item.videoUrl, {
+                                    responseType: "arraybuffer"
+                                })
+                                .then(videoBuf => {
+                                    const idx = videoBuf.data.indexOf(
+                                        "vid:",
+                                        0,
+                                        "ascii"
+                                    );
+                                    const vid = videoBuf.data
+                                        .slice(idx + 4, idx + 36)
+                                        .toString("ascii");
+                                    console.log("vidid", vid);
+
+                                    const url = `https://api2.musical.ly/aweme/v1/playwm/?video_id=${vid}&improve_bitrate=1`;
+                                    axios
+                                        .get(url, {
+                                            responseType: "arraybuffer"
+                                        })
+                                        .then(function(response) {
+                                            const iqr =
+                                                response.request.res
+                                                    .responseUrl;
+                                            axios
+                                                .get(iqr, {
+                                                    responseType: "arraybuffer"
+                                                })
+                                                .then(iqrResult => {
+                                                    onReady(
+                                                        {
+                                                            video: {
+                                                                description:
+                                                                    item.text
+                                                            }
+                                                        },
+                                                        require("buffer").Buffer.from(
+                                                            iqrResult.data,
+                                                            "binary"
+                                                        )
+                                                    );
+                                                })
+                                                .catch(iqrError => {
+                                                    console.log(
+                                                        "IQR ERROR",
+                                                        error
+                                                    );
+                                                });
+                                        })
+                                        .catch(function(error) {
+                                            console.log("HDMOD ERROR", error);
+                                        });
+                                })
+                                .catch(error => {
+                                    console.log("videoBufError", error);
+                                });
+                        }
+                    }
+                }
+                console.log("SCRAP", success, result);
+            },
+            200
+        );
+    });
 };
