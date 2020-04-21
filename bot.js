@@ -224,22 +224,6 @@ setInterval(() => {
     });
 }, 45000);*/
 
-setTimeout(() => {
-    let channel = client.channels.find("name", "thread");
-    let result = [];
-    let id = "";
-    client.channels.forEach(item => {
-        if (item.name === "thread") {
-            result.push(item);
-            updateLinkMap(item);
-        }
-    });
-    //console.log("CHANNELS!!!", result.length);
-    if (channel) threadChannel = result;
-    //console.log("WORKING CHANNEL", threadChannel);
-    console.log("clientid", client.user.id);
-}, 5000);
-
 const jsonCopy = src => {
     return JSON.parse(JSON.stringify(src));
 };
