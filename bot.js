@@ -38,22 +38,33 @@ logger.level = "debug";
 // Initialize Discord Bot
 var client = new Discord.Client();
 const VERSION = "6.3.2020/1752";
-var threadChannel = null;
-let linkMap = {};
 var crvLog = [];
 let bonbiWasInGame = false;
 let isReady = false;
 let scrap = {};
 let scrapW = {};
 
+let store = {
+    dvachGenerals: {
+        bonbi: {
+            threadChannel: null,
+            linkMap: {}
+        },
+        richie: {
+            threadChannel: null,
+            linkMap: {}
+        }
+    }
+};
+
 client.once("ready", () => {
     console.log("Ready!");
     isReady = true;
     reloadCatalog();
+    reloadCatalog("richie");
 });
-
-//client.login(auth.token);
 client.login(process.env.BOT_TOKEN);
+
 const findAttachmentInPost = post => {
     let result = undefined;
     if (post.files && post.files.length > 0) {
@@ -79,29 +90,56 @@ function decodeHtmlCharCodes(str) {
     });
 }
 
-setInterval(() => {
-    //console.log("updating");
-    reloadThread();
-    getCurrentThreadDesc();
-}, 10000);
-
-setTimeout(() => {
+const createDvachThreadWorker = (general = "bonbi") => {
     setInterval(() => {
-        findNewPosts();
-        const newPosts = getNewPosts();
-        if (newPosts && newPosts.length) {
-            sendNewPosts();
-        }
-    }, 15000);
-}, 5000);
+        console.log("updating");
+        reloadThread(general);
+        getCurrentThreadDesc(general);
+    }, 10000);
 
-setInterval(() => {
-    //console.log("updating catalog");
-    reloadCatalog();
     setTimeout(() => {
-        findCurrentThread();
+        setInterval(() => {
+            findNewPosts(general);
+            const newPosts = getNewPosts(general);
+            if (newPosts && newPosts.length) {
+                sendNewPosts(general);
+            }
+        }, 15000);
     }, 5000);
-}, 55000);
+
+    setInterval(() => {
+        console.log("updating catalog");
+        reloadCatalog(general);
+        setTimeout(() => {
+            findCurrentThread(general);
+        }, 5000);
+    }, 55000);
+};
+
+const findChannels = (general, channelName) => {
+    setTimeout(() => {
+        let channel = client.channels.find("name", channelName);
+        let result = [];
+        let id = "";
+        client.channels.forEach(item => {
+            if (item.name === channelName) {
+                result.push(item);
+                updateLinkMap(item, general);
+            }
+        });
+        console.log("CHANNELS!!!", result.length);
+        if (channel) {
+            store.dvachGenerals[general].threadChannel = result;
+        }
+        console.log("clientid", client.user.id);
+    }, 6000);
+};
+
+createDvachThreadWorker("bonbi");
+findChannels("bonbi", "thread");
+
+createDvachThreadWorker("richie");
+findChannels("richie", "richie-thread");
 
 const scrapWorker = (username, channelName, timeout = 60000) => {
     setInterval(() => {
@@ -243,7 +281,7 @@ const backwards = (args, channel) => {
     return channel.posts.by({ member: member.user.tag });
 };
 
-const updateLinkMap = channel => {
+const updateLinkMap = (channel, general) => {
     let result = {};
     channel
         .fetchMessages()
@@ -269,12 +307,12 @@ const updateLinkMap = channel => {
                     }
                 }
             });
-            linkMap[channel.id] = result;
+            store.dvachGenerals[general].linkMap[channel.id] = result;
         })
         .catch(console.error);
 };
 
-const preprocessPost = (channel, embed) => {
+const preprocessPost = (channel, embed, general) => {
     const em = jsonCopy(embed);
     let newDescription = em.description;
     let result = em;
@@ -282,10 +320,19 @@ const preprocessPost = (channel, embed) => {
     tokens.forEach(item => {
         if (item.substring(0, 8).includes(">>")) {
             let id = item.replace(">>", "");
-            if (linkMap[channel.id] && linkMap[channel.id]["#" + id]) {
+            if (
+                store.dvachGenerals[general].linkMap[channel.id] &&
+                store.dvachGenerals[general].linkMap[channel.id]["#" + id]
+            ) {
                 newDescription = newDescription.replace(
                     item,
-                    "[" + item + "](" + linkMap[channel.id]["#" + id] + ")"
+                    "[" +
+                        item +
+                        "](" +
+                        store.dvachGenerals[general].linkMap[channel.id][
+                            "#" + id
+                        ] +
+                        ")"
                 );
             }
         }
@@ -294,9 +341,9 @@ const preprocessPost = (channel, embed) => {
     return result;
 };
 
-const sendNewPosts = () => {
-    const newPostsD = getNewPosts();
-    const currentThreadD = getCurrentThreadDesc();
+const sendNewPosts = general => {
+    const newPostsD = getNewPosts(general);
+    const currentThreadD = getCurrentThreadDesc(general);
     newPostsD.forEach(p => {
         const embed = generatePost({
             post: {
@@ -318,16 +365,17 @@ const sendNewPosts = () => {
             },
             footerText: "#" + p.number
         });
-        if (threadChannel) {
-            threadChannel.forEach(item => {
-                item.send({ embed: preprocessPost(item, embed) });
+        if (store.dvachGenerals[general].threadChannel) {
+            store.dvachGenerals[general].threadChannel.forEach(item => {
+                item.send({ embed: preprocessPost(item, embed, general) });
                 setTimeout(() => {
-                    updateLinkMap(item);
+                    updateLinkMap(item, general);
                 }, 3000);
             });
         }
     });
 };
+
 const formatDate = (date, isTime = false) => {
     if (isTime) {
         return moment().format();
