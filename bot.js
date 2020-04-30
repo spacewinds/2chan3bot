@@ -607,6 +607,19 @@ const processLink = (channel, text) => {
     return result;
 };
 
+client.on("messageDelete", message => {
+    client.channels.forEach(item => {
+        if (item.name === "bb-audit-log") {
+            item.send(
+                "user " +
+                    message.member.user.tag +
+                    " removed messsage " +
+                    message.content
+            );
+        }
+    });
+});
+
 client.on("message", async message => {
     if (message.author.id !== "644461857591263263")
         sendToGhoul(message.channel.name, message.author.tag, message.content);
