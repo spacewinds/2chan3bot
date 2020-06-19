@@ -1,5 +1,5 @@
 const axios = require("axios");
-let hdMode = true;
+let hdMode = false;
 let TikTokScraper = null;
 setTimeout(() => {
     TikTokScraper = require("tiktok-scraper");

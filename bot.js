@@ -585,6 +585,12 @@ const randomTTPost = (channel, username) => {
     }
 };
 
+const extractData = (data, will) => {
+    if (scrap[username]) {
+        randomPost(scrap[user]);
+    }
+};
+
 const processLink = (channel, text) => {
     console.log("text", text);
     if (text.includes("'tt")) {
