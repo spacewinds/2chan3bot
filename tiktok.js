@@ -160,7 +160,7 @@ export const downloadURL = (url, onReady) => {
 
 const improveQuality = (meta, buf, onReady) => {
     console.log("META", meta);
-    if (!hdMode) onReady(buf);
+    if (!hdMode) return buf; //onReady(buf);
     const uri = meta ? (meta.video ? meta.video.uri : "") : "";
     if (!uri) onReady(buf);
     const url = `https://api2.musical.ly/aweme/v1/playwm/?video_id=${uri}&improve_bitrate=1`;
