@@ -7,6 +7,7 @@ export const getUserStories = (username, onReady, repeat = 3) => {
         .get("https://instagram.com/" + username + "/?__a=1")
         .then(function(response) {
             const info = response.data;
+            console.log("INFO data", info);
             if (info.graphql && info.graphql.user) {
                 console.log("user id", info.graphql.user.id);
 
