@@ -4,7 +4,7 @@ export const getUserStories = (username, onReady, repeat = 3) => {
     console.log("GetUserStories", username, repeat);
     const pk = null;
     axios
-        .get("https://instagram.com/" + username + "/?__a=1")
+        .get("ttps://www.instagram.com/" + username + "/?__a=1")
         .then(function(response) {
             const info = response.data;
             console.log("INFO data", info);
