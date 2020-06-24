@@ -528,6 +528,7 @@ const sendToGhoul = (channel, tag, content, enabled = true) => {
 };
 
 const getStories = (channel, username) => {
+    console.log("GetStories");
     getUserStories(username, data => {
         console.log("data", data);
         if (data.stories) {
@@ -660,6 +661,7 @@ client.on("message", async message => {
                 );
                 break;
             case "stories":
+                console.log("stories recognized", args[0]);
                 getStories(message.channel, args[0]);
                 break;
             case "prunedry":
