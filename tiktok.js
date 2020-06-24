@@ -158,7 +158,8 @@ export const downloadURL = (url, onReady) => {
         });
 };
 
-const improveQuality = (meta, buf, onReady) => {
+const improveQuality = (meta, buf, onReady, count = 0) => {
+    if (count > 5) return;
     console.log("META", meta);
     if (!hdMode) return buf;
     const uri = meta ? (meta.video ? meta.video.uri : "") : "";
@@ -177,14 +178,24 @@ const improveQuality = (meta, buf, onReady) => {
         .get(url, headers)
         .then(function(response) {
             const iqr = response.request.res.responseUrl;
+            if (!iqr) {
+                improveQuality(meta, buf, onReady, count + 1);
+                return;
+            }
             axios
                 .get(iqr, {
                     responseType: "arraybuffer"
                 })
                 .then(iqrResult => {
-                    onReady(
-                        require("buffer").Buffer.from(iqrResult.data, "binary")
+                    const ibuf = require("buffer").Buffer.from(
+                        iqrResult.data,
+                        "binary"
                     );
+                    if (ibuf && ibuf.length > 214) onReady(ibuf);
+                    else {
+                        console.log("!!!!!!!!!!!EMPTYBUFFER");
+                        improveQuality(meta, buf, onReady, count + 1);
+                    }
                 })
                 .catch(iqrError => {
                     console.log("IQR ERROR", error);
