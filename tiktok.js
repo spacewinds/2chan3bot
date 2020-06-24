@@ -1,5 +1,5 @@
 const axios = require("axios");
-let hdMode = false;
+let hdMode = true;
 let TikTokScraper = null;
 setTimeout(() => {
     TikTokScraper = require("tiktok-scraper");
@@ -121,7 +121,7 @@ export const downloadTiktokHD = (url, onReady) => {
     });
 };
 
-export const scrapUser = async (user, onReady, maxPosts = 100) => {
+export const scrapUser = async (user, onReady, maxPosts = 300) => {
     console.log("scrapUser params", user, onReady, maxPosts);
     try {
         const posts = await TikTokScraper.user(user, {
@@ -160,15 +160,21 @@ export const downloadURL = (url, onReady) => {
 
 const improveQuality = (meta, buf, onReady) => {
     console.log("META", meta);
-    if (!hdMode) return buf; //onReady(buf);
+    if (!hdMode) return buf;
     const uri = meta ? (meta.video ? meta.video.uri : "") : "";
     if (!uri) onReady(buf);
-    const url = `https://api2.musical.ly/aweme/v1/playwm/?video_id=${uri}&improve_bitrate=1`;
+    //https://api.tiktokv.com/aweme/v1/playwm/?video_id=v09044b20000brls6d9e3ejmgvhtbf3g&line=0&ratio=default&media_type=4&vr_type=0
+    //const url = `https://api.tiktokv.com/aweme/v1/playwm/?video_id=v09044b20000brls6d9e3ejmgvhtbf3g&line=0&ratio=default&media_type=4&vr_type=0https://api2.musical.ly/aweme/v1/playwm/?video_id=${uri}&improve_bitrate=1`;
+
+    const url = `https://api.tiktokv.com/aweme/v1/playwm/?video_id=${uri}&line=0&ratio=default&media_type=4&vr_type=0`;
+
+    let headers = {
+        responseType: "arraybuffer"
+    };
+    headers["user-agent"] = "tiktokapp";
 
     axios
-        .get(url, {
-            responseType: "arraybuffer"
-        })
+        .get(url, headers)
         .then(function(response) {
             const iqr = response.request.res.responseUrl;
             axios
