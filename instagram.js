@@ -1,6 +1,7 @@
 const axios = require("axios");
 
 export const getUserStories = (username, onReady, repeat = 3) => {
+    console.log("GetUserStories", username, repeat);
     const pk = null;
     axios
         .get("https://instagram.com/" + username + "/?__a=1")
