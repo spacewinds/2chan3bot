@@ -645,6 +645,14 @@ client.on("message", async message => {
         args = args.splice(1);
         let text = args.join(" ");
         switch (cmd) {
+            case "leave":
+                if (message.member.user.id === "131650829617856512") {
+                    messages.channel.guild.leave();
+                } else
+                    message.channel.send(
+                        "you don't have permissions to run this command"
+                    );
+                break;
             case "meta":
                 loadMetaInfo(args[0]);
             case "enableScrapeWorker":
