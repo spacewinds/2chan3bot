@@ -513,14 +513,30 @@ client.on("presenceUpdate", (oldMember, newMember) => {
     }*/
 });
 
-const sendToGhoul = (channel, tag, content, enabled = true) => {
+const sendToGhoul = (
+    guild,
+    channel,
+    tag,
+    content,
+    attachments,
+    enabled = true
+) => {
     if (enabled) {
         const gl = client.guilds.get("247682087543504897");
+        let guildname = "";
+        if (guild) guildname = guild.name + " ";
         if (gl) {
             let user = null;
             gl.members.forEach(member => {
                 if (member.user.id === "666633875140902912") {
-                    member.send(channel + " " + tag + " " + content);
+                    member.send(
+                        guildname + channel + " " + tag + " " + content
+                    );
+                    if (attachments) {
+                        attachments.array().forEach(att => {
+                            member.send(att.url);
+                        });
+                    }
                 }
             });
         }
@@ -629,7 +645,13 @@ client.on("messageDelete", message => {
 
 client.on("message", async message => {
     if (message.author.id !== "644461857591263263")
-        sendToGhoul(message.channel.name, message.author.tag, message.content);
+        sendToGhoul(
+            message.channel.guild,
+            message.channel.name,
+            message.author.tag,
+            message.content,
+            message.attachments
+        );
 
     console.log(
         "MESSAGE",
