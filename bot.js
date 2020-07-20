@@ -630,6 +630,35 @@ const processLink = (channel, text) => {
     return result;
 };
 
+const tryProvideAccess = message => {
+    const channel = message.channel.guild.channels.find(
+        "name",
+        "passport-control"
+    );
+    let passportPlace = false;
+    if (channel) if (message.channel.id === channel.id) passportPlace = true;
+    console.log("passportPlace", passportPlace);
+
+    if (passportPlace) {
+        switch (message.content.toLowerCase()) {
+            case "hi":
+            case "hello":
+            case "privet":
+            case "хай":
+            case "привет":
+                const role = message.channel.guild.roles.find(
+                    "name",
+                    "Citizen"
+                );
+                if (role && message.member.roles.array().length === 1) {
+                    message.member.addRole(role);
+                }
+                break;
+            default:
+        }
+    }
+};
+
 client.on("messageDelete", message => {
     client.channels.forEach(item => {
         if (item.name === "bb-audit-log") {
@@ -652,15 +681,9 @@ client.on("message", async message => {
             message.content,
             message.attachments
         );
-
-    console.log(
-        "MESSAGE",
-        message.channel.name,
-        message.author.tag,
-        message.content
-    );
     const content = message.content;
     if (processLink(message.channel, content)) return;
+    tryProvideAccess(message);
     if (content.substring(0, 1) == "-") {
         var args = content.substring(1).split(" ");
         var cmd = args[0];
