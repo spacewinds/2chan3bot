@@ -621,7 +621,8 @@ const processLink = (channel, text) => {
         const value = link[0];
         if (
             value.includes("https://www.tiktok.com/") ||
-            value.includes("https://vm.tiktok.com/")
+            value.includes("https://vm.tiktok.com/") ||
+            value.includes("https://vt.tiktok.com/")
         ) {
             downloadTiktok(channel, value);
             result = false;

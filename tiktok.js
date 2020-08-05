@@ -11,7 +11,7 @@ const randomInt = max => {
 };
 
 export const extractIdFromUrl = (url, onReady) => {
-    if (url.includes("vm.tiktok.com/")) {
+    if (url.includes("vm.tiktok.com/") || url.includes("vt.tiktok.com/")) {
         axios
             .get(url)
             .then(response => {
@@ -193,7 +193,6 @@ const improveQuality = (meta, buf, onReady, count = 0) => {
                     );
                     if (ibuf && ibuf.length > 214) onReady(ibuf);
                     else {
-                        console.log("!!!!!!!!!!!EMPTYBUFFER");
                         improveQuality(meta, buf, onReady, count + 1);
                     }
                 })
