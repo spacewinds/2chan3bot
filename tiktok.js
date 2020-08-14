@@ -167,15 +167,16 @@ const improveQuality = (meta, buf, onReady, count = 0) => {
     //https://api.tiktokv.com/aweme/v1/playwm/?video_id=v09044b20000brls6d9e3ejmgvhtbf3g&line=0&ratio=default&media_type=4&vr_type=0
     //const url = `https://api.tiktokv.com/aweme/v1/playwm/?video_id=v09044b20000brls6d9e3ejmgvhtbf3g&line=0&ratio=default&media_type=4&vr_type=0https://api2.musical.ly/aweme/v1/playwm/?video_id=${uri}&improve_bitrate=1`;
 
-    const url = `https://api.tiktokv.com/aweme/v1/playwm/?video_id=${uri}&line=0&ratio=default&media_type=4&vr_type=0`;
+    //const url = `https://api.tiktokv.com/aweme/v1/playwm/?video_id=${uri}&line=0&ratio=default&media_type=4&vr_type=0`;
 
+    const url = `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${uri}&ratio=default&improve_bitrate=1`;
     let headers = {
         responseType: "arraybuffer"
     };
     headers["user-agent"] = "tiktokapp";
 
     axios
-        .get(url, headers)
+        .get(url, { headers: { "User-Agent": "tiktokapp" } })
         .then(function(response) {
             const iqr = response.request.res.responseUrl;
             if (!iqr) {
