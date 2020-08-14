@@ -632,30 +632,33 @@ const processLink = (channel, text) => {
 };
 
 const tryProvideAccess = message => {
-    const channel = message.channel.guild.channels.find(
-        "name",
-        "passport-control"
-    );
-    let passportPlace = false;
-    if (channel) if (message.channel.id === channel.id) passportPlace = true;
-    console.log("passportPlace", passportPlace);
+    if (message && message.channel && message.channel.guild) {
+        const channel = message.channel.guild.channels.find(
+            "name",
+            "passport-control"
+        );
+        let passportPlace = false;
+        if (channel)
+            if (message.channel.id === channel.id) passportPlace = true;
+        console.log("passportPlace", passportPlace);
 
-    if (passportPlace) {
-        switch (message.content.toLowerCase()) {
-            case "hi":
-            case "hello":
-            case "privet":
-            case "хай":
-            case "привет":
-                const role = message.channel.guild.roles.find(
-                    "name",
-                    "Citizen"
-                );
-                if (role && message.member.roles.array().length === 1) {
-                    message.member.addRole(role);
-                }
-                break;
-            default:
+        if (passportPlace) {
+            switch (message.content.toLowerCase()) {
+                case "hi":
+                case "hello":
+                case "privet":
+                case "хай":
+                case "привет":
+                    const role = message.channel.guild.roles.find(
+                        "name",
+                        "Citizen"
+                    );
+                    if (role && message.member.roles.array().length === 1) {
+                        message.member.addRole(role);
+                    }
+                    break;
+                default:
+            }
         }
     }
 };
