@@ -547,19 +547,19 @@ const getStories = (channel, username) => {
     console.log("GetStories");
     getUserStories(username, data => {
         console.log("data", data);
-        if (data.stories) {
-            data.stories.forEach(story => {
+        if (data) {
+            data.forEach(story => {
                 if (story.img) {
                     channel.send(
                         "",
-                        new Discord.Attachment(story.img, story.id + ".jpg")
+                        new Discord.Attachment(story.img.src, Math.random().toString(36).substr(2, 5); + ".jpg")
                     );
                 } else if (story.video) {
                     channel.send(
                         "",
                         new Discord.Attachment(
-                            story.video.url,
-                            story.id + ".mp4"
+                            story.video.src,
+                            Math.random().toString(36).substr(2, 5); + ".mp4"
                         )
                     );
                 }
