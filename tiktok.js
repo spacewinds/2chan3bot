@@ -34,9 +34,6 @@ export const extractIdFromUrl = (url, onReady) => {
                                 onReady
                             );
                         });
-
-                    //console.log("result", result);
-                    //onReady(result);
                 }
             })
             .catch(error => {
