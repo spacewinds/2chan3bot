@@ -250,7 +250,7 @@ export const findBonbiThreadsSubjects = general => {
 
 export const findCurrentThread = (general = "bonbi") => {
     const threads = findBonbiThreadsSubjects(general);
-    //console.log("findCurrentThread", threads);
+    console.log("findCurrentThread", threads);
     if (threads && threads.length > 0) {
         state[general].currentThreadDesc = threads[0];
         return state[general].currentThreadDesc;
@@ -267,7 +267,7 @@ export const reloadThread = (general = "bonbi") => {
             )
             .then(function(response) {
                 state[general].currentThreadData = response.data;
-                //console.log("reload thread success");
+                console.log("reload thread success");
             })
             .catch(function(error) {
                 // handle error
