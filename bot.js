@@ -88,7 +88,7 @@ client.on("presenceUpdate", (oldMember, newMember) => {
     let status = newMember.user.presence.status;
 });
 
-const sendToGhoul = (
+const sendToGhoulAI = (
     guild,
     channel,
     tag,
@@ -221,7 +221,7 @@ client.on("messageDelete", message => {
 
 client.on("message", async message => {
     if (message.author.id !== "644461857591263263")
-        sendToGhoul(
+        sendToGhoulAI(
             message.channel.guild,
             message.channel.name,
             message.author.tag,
