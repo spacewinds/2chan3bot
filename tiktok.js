@@ -72,6 +72,7 @@ export const loadMetaInfo = (id, onReady) => {
             headers: headersJson
         })
         .then(response => {
+            console.log(response.data);
             console.log("META DATA", {
                 desc: response.data.desc,
                 video: {
@@ -80,7 +81,15 @@ export const loadMetaInfo = (id, onReady) => {
                         response.data.aweme_detail.play_addr.url_list[0]
                 }
             });
-            if (onReady) onReady(response.data);
+            if (onReady)
+                onReady({
+                    desc: response.data.desc,
+                    video: {
+                        uri: response.data.aweme_detail.play_addr.uri,
+                        download_url:
+                            response.data.aweme_detail.play_addr.url_list[0]
+                    }
+                });
         })
         .catch(error => {
             console.log("META ERROR", error);
