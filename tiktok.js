@@ -105,8 +105,8 @@ export const extractIdFromUrl = (url, onReady) => {
             .get(url)
             .then(response => {
                 const data = response.request.path;
-                console.log("url data", response);
-                const idx = data.indexOf(".html?u_code");
+                let idx = data.indexOf(".html?u_code");
+                if (idx < 0) idx = data.indexOf(".html?_d");
                 if (idx >= 0) {
                     const result = data.slice(3, 3 + 19);
                     axios
