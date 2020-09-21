@@ -218,31 +218,33 @@ export const downloadTiktokMeta = (url, onReady) => {
             onReady(result.meta, result.buffer);
         });
     } else {
-        loadMetaInfo(extractIdFromUrl(url).videoId, meta => {
-            if (meta && meta.video && meta.video.download_url) {
-                if (hdMode) {
-                    improveQuality(meta, null, buffer => {
-                        onReady(meta, buffer);
-                    });
-                } else {
-                    axios
-                        .get(meta.video.download_url, {
-                            responseType: "arraybuffer"
-                        })
-                        .then(fr => {
-                            onReady(
-                                meta,
-                                improveQuality(
-                                    meta,
-                                    require("buffer").Buffer.from(
-                                        fr.data,
-                                        "binary"
-                                    )
-                                )
-                            );
+        extractIdFromUrl(url, desc => {
+            loadMetaInfo(desc.videoId, meta => {
+                if (meta && meta.video && meta.video.download_url) {
+                    if (hdMode) {
+                        improveQuality(meta, null, buffer => {
+                            onReady(meta, buffer);
                         });
+                    } else {
+                        axios
+                            .get(meta.video.download_url, {
+                                responseType: "arraybuffer"
+                            })
+                            .then(fr => {
+                                onReady(
+                                    meta,
+                                    improveQuality(
+                                        meta,
+                                        require("buffer").Buffer.from(
+                                            fr.data,
+                                            "binary"
+                                        )
+                                    )
+                                );
+                            });
+                    }
                 }
-            }
+            });
         });
     }
 };
