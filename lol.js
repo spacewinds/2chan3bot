@@ -1,6 +1,6 @@
 const axios = require("axios");
 const { Kayn, REGIONS } = require("kayn");
-const kayn = Kayn(process.env.RIOT_API)();
+//const kayn = Kayn(process.env.RIOT_API)();
 
 export const checkIfUserIsInGame = (nickname, onReady) => {
     kayn.Summoner.by
