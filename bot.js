@@ -67,20 +67,10 @@ const downloadTiktok = (channel, url) => {
                 new Discord.Attachment(buffer, meta.video.id + ".mp4")
             )
             .catch(error => {
-                console.log("Discord send error", error);
-                downloadTiktokMeta(
-                    url,
-                    (meta, buffer) => {
-                        channel.send(
-                            meta.desc,
-                            new Discord.Attachment(
-                                buffer,
-                                meta.video.id + ".mp4"
-                            )
-                        );
-                    },
-                    0
-                );
+                console.log("DISCORD SEND ERROR");
+                downloadURL(meta.download_url, buffer => {
+                    console.log("tiktok response", buffer);
+                });
             });
     });
 };

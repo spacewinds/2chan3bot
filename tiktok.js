@@ -205,7 +205,10 @@ export const randomPost = (collection, username, onReady) => {
 export const downloadURL = (url, onReady) => {
     axios
         .get(url, {
-            responseType: "arraybuffer"
+            responseType: "arraybuffer",
+            headers: {
+                "User-Agent": "tiktokapp"
+            }
         })
         .then(fr => {
             onReady(require("buffer").Buffer.from(fr.data, "binary"));
