@@ -253,7 +253,7 @@ const improveQuality = (meta, buf, onReady, count = 0) => {
                     }
                 })
                 .catch(iqrError => {
-                    console.log("IQR ERROR", error);
+                    console.log("IQR ERROR", iqrError);
                 });
         })
         .catch(function(error) {
