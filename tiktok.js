@@ -1,4 +1,5 @@
 const axios = require("axios");
+const Discord = require("discord.js");
 let hdMode = true;
 let TikTokScraper = null;
 let scrapW = {};
