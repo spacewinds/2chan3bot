@@ -139,6 +139,7 @@ export const extractIdFromUrl = (url, onReady) => {
         if (idxA >= 0) {
             result.userName = url.slice(idxA + 1, idx);
         }
+        result.videoId = result.videoId.replace("?", "");
         console.log("RESULT", result);
         onReady(result);
     }
