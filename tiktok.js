@@ -218,7 +218,7 @@ export const downloadTiktokMeta = (url, onReady) => {
             onReady(result.meta, result.buffer);
         });
     } else {
-        loadMetaInfo(extractIdFromUrl(url), meta => {
+        loadMetaInfo(extractIdFromUrl(url).videoId, meta => {
             if (meta && meta.video && meta.video.download_url) {
                 if (hdMode) {
                     improveQuality(meta, null, buffer => {
