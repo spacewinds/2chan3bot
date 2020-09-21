@@ -62,7 +62,7 @@ const forward = args => {
 const downloadTiktok = (channel, url) => {
     downloadTiktokMeta(url, (meta, buffer) => {
         channel.send(
-            meta.video.description,
+            meta.desc,
             new Discord.Attachment(buffer, meta.video.id + ".mp4")
         );
     });
