@@ -72,15 +72,20 @@ export const loadMetaInfo = (id, onReady) => {
             headers: headersJson
         })
         .then(response => {
-            console.log("META DATA", response.data.aweme_detail.video);
+            console.log("META DATA", {
+                desc: response.data.desc,
+                video: {
+                    uri: response.data.aweme_detail.play_addr.uri,
+                    download_url:
+                        response.data.aweme_detail.play_addr.url_list[0]
+                }
+            });
             if (onReady) onReady(response.data);
         })
         .catch(error => {
             console.log("META ERROR", error);
         });
 };
-
-loadMetaInfo("6868744504808099078", () => {});
 
 export const downloadTiktokHD = (url, onReady) => {
     extractIdFromUrl(url, id => {
@@ -204,39 +209,32 @@ export const downloadTiktokMeta = (url, onReady) => {
             onReady(result.meta, result.buffer);
         });
     } else {
-        axios
-            .get("http://185.227.111.142/api/video/get-by-url?url=" + url)
-            .then(function(response) {
-                const meta = response.data;
-                if (meta && meta.video && meta.video.download_url) {
-                    if (hdMode) {
-                        improveQuality(meta, null, buffer => {
-                            onReady(meta, buffer);
-                        });
-                    } else {
-                        axios
-                            .get(meta.video.download_url, {
-                                responseType: "arraybuffer"
-                            })
-                            .then(fr => {
-                                onReady(
+        loadMetaInfo(url, meta => {
+            if (meta && meta.video && meta.video.download_url) {
+                if (hdMode) {
+                    improveQuality(meta, null, buffer => {
+                        onReady(meta, buffer);
+                    });
+                } else {
+                    axios
+                        .get(meta.video.download_url, {
+                            responseType: "arraybuffer"
+                        })
+                        .then(fr => {
+                            onReady(
+                                meta,
+                                improveQuality(
                                     meta,
-                                    improveQuality(
-                                        meta,
-                                        require("buffer").Buffer.from(
-                                            fr.data,
-                                            "binary"
-                                        )
+                                    require("buffer").Buffer.from(
+                                        fr.data,
+                                        "binary"
                                     )
-                                );
-                            });
-                    }
+                                )
+                            );
+                        });
                 }
-            })
-            .catch(function(error) {
-                downloadTiktokEmergencyMode(url, onReady);
-                console.log(error);
-            });
+            }
+        });
     }
 };
 
