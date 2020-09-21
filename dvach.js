@@ -267,7 +267,7 @@ export const reloadThread = (general = "bonbi") => {
             )
             .then(function(response) {
                 state[general].currentThreadData = response.data;
-                console.log("reload thread success");
+                //console.log("reload thread success");
             })
             .catch(function(error) {
                 // handle error
@@ -304,7 +304,6 @@ export const reloadCatalog = (general = "bonbi") => {
             state[general].catalogData = response.data;
         })
         .catch(function(error) {
-            // handle error
             console.log(error);
         });
 };
