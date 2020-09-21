@@ -1,3 +1,4 @@
+const Discord = require("discord.js");
 const sharp = require("sharp");
 import { downloadURL } from "./tiktok";
 
