@@ -57,7 +57,7 @@ let store = {
     }
 };
 
-const findChannels = (client, general, channelName) => {
+export const findChannels = (client, general, channelName) => {
     setTimeout(() => {
         let channel = client.channels.find("name", channelName);
         let result = [];
