@@ -2,7 +2,7 @@ const axios = require("axios");
 var decode = require("decode-html");
 var striptags = require("striptags");
 import { generatePost } from "./embeds";
-
+import { jsonCopy } from "./utils";
 var catalogData = null;
 var currentThreadDesc = null;
 var currentThreadData = null;
