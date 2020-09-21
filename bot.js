@@ -61,24 +61,27 @@ const forward = args => {
 
 const downloadTiktok = (channel, url) => {
     downloadTiktokMeta(url, (meta, buffer) => {
-        try {
-            channel.send(
+        channel
+            .send(
                 meta.desc,
                 new Discord.Attachment(buffer, meta.video.id + ".mp4")
-            );
-        } catch (error) {
-            console.log("Discord send error", error);
-            downloadTiktokMeta(
-                url,
-                (meta, buffer) => {
-                    channel.send(
-                        meta.desc,
-                        new Discord.Attachment(buffer, meta.video.id + ".mp4")
-                    );
-                },
-                0
-            );
-        }
+            )
+            .catch(error => {
+                console.log("Discord send error", error);
+                downloadTiktokMeta(
+                    url,
+                    (meta, buffer) => {
+                        channel.send(
+                            meta.desc,
+                            new Discord.Attachment(
+                                buffer,
+                                meta.video.id + ".mp4"
+                            )
+                        );
+                    },
+                    0
+                );
+            });
     });
 };
 
