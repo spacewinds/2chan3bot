@@ -1,6 +1,9 @@
 const axios = require("axios");
 let hdMode = true;
 let TikTokScraper = null;
+let scrapW = {};
+let scrap = {};
+
 setTimeout(() => {
     TikTokScraper = require("tiktok-scraper");
     console.log("TTS is ready");
@@ -8,6 +11,91 @@ setTimeout(() => {
 
 const randomInt = max => {
     return Math.floor(Math.random() * Math.floor(max));
+};
+
+export const scrapf = (channel, username, count) => {
+    scrapUser(
+        username,
+        (success, result) => {
+            if (success) {
+                scrap[username] = result;
+                channel.send(
+                    "Scrapped " +
+                        username +
+                        " successfully! [" +
+                        result.collector.length +
+                        "]"
+                );
+            } else {
+                channel.send("Scrapping failed" + result);
+            }
+        },
+        count
+    );
+};
+
+export const randomTTPost = (channel, username) => {
+    if (scrap[username]) {
+        randomPost(scrap[username], username, (meta, buffer) => {
+            channel.send(
+                meta.video.description,
+                new Discord.Attachment(buffer, meta.video.id + ".mp4")
+            );
+        });
+    } else {
+        channel.send("user " + username + " is not scrapped yet");
+    }
+};
+
+export const scrapWorker = (client, username, channelName, timeout = 60000) => {
+    setInterval(() => {
+        console.log("scraping " + username);
+        scrapUser(
+            username,
+            (success, result) => {
+                if (success) {
+                    if (scrapW[username]) {
+                        if (
+                            scrapW[username].collector &&
+                            scrapW[username].collector.length > 0 &&
+                            result.collector &&
+                            result.collector.length > 0
+                        ) {
+                            if (
+                                result.collector[0].createTime >
+                                scrapW[username].collector[0].createTime
+                            ) {
+                                const video = result.collector[0];
+                                const link =
+                                    "https://www.tiktok.com/@" +
+                                    username +
+                                    "/video/" +
+                                    video.id;
+
+                                downloadTiktokMeta(link, (meta, buffer) => {
+                                    client.channels.forEach(item => {
+                                        if (item.name === channelName) {
+                                            item.send(
+                                                meta.video.description,
+                                                new Discord.Attachment(
+                                                    buffer,
+                                                    meta.video.id + ".mp4"
+                                                )
+                                            );
+                                        }
+                                    });
+                                });
+                            }
+                        }
+                    }
+                    scrapW[username] = result;
+                } else {
+                    console.log("Scrapping failed! " + result);
+                }
+            },
+            10
+        );
+    }, timeout);
 };
 
 export const extractIdFromUrl = (url, onReady) => {
@@ -72,15 +160,6 @@ export const loadMetaInfo = (id, onReady) => {
             headers: headersJson
         })
         .then(response => {
-            console.log("META DATA", {
-                desc: response.data.desc,
-                video: {
-                    uri: response.data.aweme_detail.video.play_addr.uri,
-                    download_url:
-                        response.data.aweme_detail.video.play_addr.url_list[0],
-                    id
-                }
-            });
             if (onReady)
                 onReady({
                     desc: response.data.desc,
@@ -96,37 +175,6 @@ export const loadMetaInfo = (id, onReady) => {
         .catch(error => {
             console.log("META ERROR", error);
         });
-};
-
-export const downloadTiktokHD = (url, onReady) => {
-    extractIdFromUrl(url, id => {
-        //console.log()
-        loadMetaInfo(id, data => {
-            console.log("AWEME DATA", data);
-            if (data) {
-                const videoId = data.aweme_detail.video.play_addr.uri;
-                console.log("ID VIDEO", videoId);
-                const hdLink = `https://api2.musical.ly/aweme/v1/playwm/?video_id=${videoId}&improve_bitrate=1`;
-                axios
-                    .get(hdLink, {
-                        responseType: "arraybuffer"
-                    })
-                    .then(function(response) {
-                        console.log(response);
-                        onReady({
-                            meta: data.aweme_detail,
-                            buffer: require("buffer").Buffer.from(
-                                response.data,
-                                "binary"
-                            )
-                        });
-                    })
-                    .catch(function(error) {
-                        console.log("HDMOD ERROR", error);
-                    });
-            }
-        });
-    });
 };
 
 export const scrapUser = async (user, onReady, maxPosts = 300) => {
@@ -173,8 +221,7 @@ const improveQuality = (meta, buf, onReady, count = 0) => {
     const uri = meta ? (meta.video ? meta.video.uri : "") : "";
     if (!uri) onReady(buf);
     //https://api.tiktokv.com/aweme/v1/playwm/?video_id=v09044b20000brls6d9e3ejmgvhtbf3g&line=0&ratio=default&media_type=4&vr_type=0
-    //const url = `https://api.tiktokv.com/aweme/v1/playwm/?video_id=v09044b20000brls6d9e3ejmgvhtbf3g&line=0&ratio=default&media_type=4&vr_type=0https://api2.musical.ly/aweme/v1/playwm/?video_id=${uri}&improve_bitrate=1`;
-
+    //https://api2.musical.ly/aweme/v1/playwm/?video_id=${uri}&improve_bitrate=1`;
     //const url = `https://api.tiktokv.com/aweme/v1/playwm/?video_id=${uri}&line=0&ratio=default&media_type=4&vr_type=0`;
 
     const url = `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${uri}&ratio=default&improve_bitrate=1`;
@@ -215,40 +262,34 @@ const improveQuality = (meta, buf, onReady, count = 0) => {
 };
 
 export const downloadTiktokMeta = (url, onReady) => {
-    if (hdMode && false) {
-        downloadTiktokHD(url, result => {
-            onReady(result.meta, result.buffer);
-        });
-    } else {
-        extractIdFromUrl(url, desc => {
-            loadMetaInfo(desc.videoId, meta => {
-                if (meta && meta.video && meta.video.download_url) {
-                    if (hdMode) {
-                        improveQuality(meta, null, buffer => {
-                            onReady(meta, buffer);
-                        });
-                    } else {
-                        axios
-                            .get(meta.video.download_url, {
-                                responseType: "arraybuffer"
-                            })
-                            .then(fr => {
-                                onReady(
+    extractIdFromUrl(url, desc => {
+        loadMetaInfo(desc.videoId, meta => {
+            if (meta && meta.video && meta.video.download_url) {
+                if (hdMode) {
+                    improveQuality(meta, null, buffer => {
+                        onReady(meta, buffer);
+                    });
+                } else {
+                    axios
+                        .get(meta.video.download_url, {
+                            responseType: "arraybuffer"
+                        })
+                        .then(fr => {
+                            onReady(
+                                meta,
+                                improveQuality(
                                     meta,
-                                    improveQuality(
-                                        meta,
-                                        require("buffer").Buffer.from(
-                                            fr.data,
-                                            "binary"
-                                        )
+                                    require("buffer").Buffer.from(
+                                        fr.data,
+                                        "binary"
                                     )
-                                );
-                            });
-                    }
+                                )
+                            );
+                        });
                 }
-            });
+            }
         });
-    }
+    });
 };
 
 export const downloadTiktokEmergencyMode = (url, onReady) => {

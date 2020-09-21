@@ -2,39 +2,12 @@ const axios = require("axios");
 const Instagram = require("instagram-web-api");
 let xmlParser = require("xml2json");
 var html2json = require("html2json").html2json;
-
-function findNode(id, currentNode) {
-    var i, currentChild, result;
-    result = [];
-
-    if (id == currentNode.class) {
-        result.push(currentNode);
-    } else {
-        Object.keys(currentNode).forEach(key => {
-            currentChild = currentNode[key];
-            if (typeof currentChild === "object") {
-                const innerData = findNode(id, currentChild);
-                innerData.forEach(item => {
-                    result.push(item);
-                });
-            }
-        });
-    }
-    return result;
-}
-
-function get_url_extension(url) {
-    return url
-        .split(/[#?]/)[0]
-        .split(".")
-        .pop()
-        .trim();
-}
+import { findNode, getUrlExtension } from "./utils";
 
 function instaDPFormat(data) {
     let result = [];
     data.forEach(item => {
-        if (get_url_extension(item.href).toLowerCase() === "jpg") {
+        if (getUrlExtension(item.href).toLowerCase() === "jpg") {
             result.push({ img: { src: item.href } });
         } else {
             result.push({ video: { src: item.href } });
@@ -54,7 +27,7 @@ export const getUserStories_DP = (user, onReady) => {
                 console.log("result");
                 onReady(result);
             } catch (err) {
-                console.log("insta broken");
+                console.log("insta broken/DP");
             }
         })
         .catch(error => {

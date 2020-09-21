@@ -1,7 +1,6 @@
 const axios = require("axios");
 var decode = require("decode-html");
 var striptags = require("striptags");
-import { generatePost } from "./embeds";
 import { jsonCopy } from "./utils";
 var catalogData = null;
 var currentThreadDesc = null;
@@ -125,6 +124,25 @@ const sendNewPosts = general => {
             });
         }
     });
+};
+
+const generatePost = data => {
+    const result = {
+        color: data.color ? data.color : 0x0099ff,
+        title: data.thread.name + " #" + data.post.number,
+        url: data.post.url,
+        description: data.post.text,
+        thumbnail: data.post.attachment
+            ? {
+                  url: data.post.attachment
+              }
+            : undefined,
+        timestamp: data.post.date ? data.post.date : new Date(),
+        footer: {
+            text: data.footerText
+        }
+    };
+    return result;
 };
 
 const preprocessPost = (channel, embed, general) => {

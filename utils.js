@@ -39,3 +39,31 @@ export const formatDate = (date, isTime = false) => {
         (isTime ? " " + hour + ":" + minute + "::" + seconds : "")
     );
 };
+
+export const findNode = (id, currentNode) => {
+    var i, currentChild, result;
+    result = [];
+
+    if (id == currentNode.class) {
+        result.push(currentNode);
+    } else {
+        Object.keys(currentNode).forEach(key => {
+            currentChild = currentNode[key];
+            if (typeof currentChild === "object") {
+                const innerData = findNode(id, currentChild);
+                innerData.forEach(item => {
+                    result.push(item);
+                });
+            }
+        });
+    }
+    return result;
+};
+
+export const getUrlExtension = url => {
+    return url
+        .split(/[#?]/)[0]
+        .split(".")
+        .pop()
+        .trim();
+};
