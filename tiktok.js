@@ -72,13 +72,13 @@ export const loadMetaInfo = (id, onReady) => {
             headers: headersJson
         })
         .then(response => {
-            console.log(response.data);
             console.log("META DATA", {
                 desc: response.data.desc,
                 video: {
                     uri: response.data.aweme_detail.video.play_addr.uri,
                     download_url:
-                        response.data.aweme_detail.video.play_addr.url_list[0]
+                        response.data.aweme_detail.video.play_addr.url_list[0],
+                    id
                 }
             });
             if (onReady)
@@ -88,7 +88,8 @@ export const loadMetaInfo = (id, onReady) => {
                         uri: response.data.aweme_detail.video.play_addr.uri,
                         download_url:
                             response.data.aweme_detail.video.play_addr
-                                .url_list[0]
+                                .url_list[0],
+                        id
                     }
                 });
         })
