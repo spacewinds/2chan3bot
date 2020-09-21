@@ -108,7 +108,7 @@ export const extractIdFromUrl = (url, onReady) => {
                 let idx = data.indexOf(".html?u_code");
                 if (idx < 0) idx = data.indexOf(".html?_d");
                 if (idx >= 0) {
-                    const result = data.slice(3, 3 + 19);
+                    const result = data.slice(3, 3 + 19).replace("?", "");
                     axios
                         .get(response.request.res.responseUrl, {
                             headers: {
