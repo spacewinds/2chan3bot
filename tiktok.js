@@ -76,16 +76,19 @@ export const loadMetaInfo = (id, onReady) => {
             console.log("META DATA", {
                 desc: response.data.desc,
                 video: {
-                    uri: response.data.video.play_addr.uri,
-                    download_url: response.data.video.play_addr.url_list[0]
+                    uri: response.data.aweme_detail.video.play_addr.uri,
+                    download_url:
+                        response.data.aweme_detail.video.play_addr.url_list[0]
                 }
             });
             if (onReady)
                 onReady({
                     desc: response.data.desc,
                     video: {
-                        uri: response.data.video.play_addr.uri,
-                        download_url: response.data.video.play_addr.url_list[0]
+                        uri: response.data.aweme_detail.video.play_addr.uri,
+                        download_url:
+                            response.data.aweme_detail.video.play_addr
+                                .url_list[0]
                     }
                 });
         })
