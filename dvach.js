@@ -1,4 +1,7 @@
 const axios = require("axios");
+var decode = require("decode-html");
+var striptags = require("striptags");
+import { generatePost } from "./embeds";
 
 var catalogData = null;
 var currentThreadDesc = null;
@@ -15,6 +18,12 @@ export const getCurrentThreadData = (general = "bonbi") => {
 export const getNewPosts = (general = "bonbi") => {
     return state[general].newPosts;
 };
+
+function decodeHtmlCharCodes(str) {
+    return str.replace(/(&#(\d+);)/g, function(match, capture, charCode) {
+        return String.fromCharCode(charCode);
+    });
+}
 
 let state = {
     bonbi: {
@@ -33,6 +42,172 @@ let state = {
         newPosts: [],
         keywords: ["richie"]
     }
+};
+
+let store = {
+    dvachGenerals: {
+        bonbi: {
+            threadChannel: null,
+            linkMap: {}
+        },
+        richie: {
+            threadChannel: null,
+            linkMap: {}
+        }
+    }
+};
+
+const findChannels = (client, general, channelName) => {
+    setTimeout(() => {
+        let channel = client.channels.find("name", channelName);
+        let result = [];
+        let id = "";
+        client.channels.forEach(item => {
+            if (item.name === channelName) {
+                result.push(item);
+                updateLinkMap(item, general);
+            }
+        });
+        if (channel) {
+            store.dvachGenerals[general].threadChannel = result;
+        }
+    }, 6000);
+};
+
+export const findAttachmentInPost = post => {
+    let result = undefined;
+    if (post.files && post.files.length > 0) {
+        post.files.forEach(item => {
+            if (!result) {
+                if (
+                    item.path.toLowerCase().includes(".png") ||
+                    item.path.toLowerCase().includes(".jpg") ||
+                    item.path.toLowerCase().includes(".gif")
+                ) {
+                    result = "https://2ch.hk" + item.path;
+                }
+            }
+        });
+    }
+    return result;
+};
+
+const sendNewPosts = general => {
+    const newPostsD = getNewPosts(general);
+    const currentThreadD = getCurrentThreadDesc(general);
+    newPostsD.forEach(p => {
+        const embed = generatePost({
+            post: {
+                number: p.num,
+                url:
+                    "https://2ch.hk/fag/res/" +
+                    currentThreadD.num +
+                    ".html#" +
+                    p.num,
+                text: decodeHtmlCharCodes(
+                    striptags(decode(p.comment), [], "\n")
+                ),
+                attachment: findAttachmentInPost(p),
+                date: new Date(p.timestamp * 1000)
+            },
+            thread: {
+                name: currentThreadD.subject,
+                url: "https://2ch.hk/fag/res/" + currentThreadD.num + ".html"
+            },
+            footerText: "#" + p.number
+        });
+        if (store.dvachGenerals[general].threadChannel) {
+            store.dvachGenerals[general].threadChannel.forEach(item => {
+                item.send({ embed: preprocessPost(item, embed, general) });
+                setTimeout(() => {
+                    updateLinkMap(item, general);
+                }, 3000);
+            });
+        }
+    });
+};
+
+const preprocessPost = (channel, embed, general) => {
+    const em = jsonCopy(embed);
+    let newDescription = em.description;
+    let result = em;
+    const tokens = em.description.split(/(\s+)/);
+    tokens.forEach(item => {
+        if (item.substring(0, 8).includes(">>")) {
+            let id = item.replace(">>", "");
+            if (
+                store.dvachGenerals[general].linkMap[channel.id] &&
+                store.dvachGenerals[general].linkMap[channel.id]["#" + id]
+            ) {
+                newDescription = newDescription.replace(
+                    item,
+                    "[" +
+                        item +
+                        "](" +
+                        store.dvachGenerals[general].linkMap[channel.id][
+                            "#" + id
+                        ] +
+                        ")"
+                );
+            }
+        }
+    });
+    result.description = newDescription;
+    return result;
+};
+
+const updateLinkMap = (channel, general) => {
+    let result = {};
+    channel
+        .fetchMessages()
+        .then(messages => {
+            const list = messages.last();
+            const messagesArray = list.channel.messages.array();
+            messagesArray.forEach(mItem => {
+                let currentTitle = mItem.embeds.length
+                    ? mItem.embeds[0].title
+                    : "";
+                if (currentTitle) {
+                    let lastToken = currentTitle.split(" ");
+                    lastToken = lastToken[lastToken.length - 1];
+                    if (lastToken) {
+                        result[lastToken] =
+                            "https://discordapp.com/channels/" +
+                            mItem.channel.guild.id +
+                            "/" +
+                            mItem.channel.id +
+                            "/" +
+                            mItem.id;
+                    }
+                }
+            });
+            store.dvachGenerals[general].linkMap[channel.id] = result;
+        })
+        .catch(console.error);
+};
+
+export const createDvachThreadWorker = (general = "bonbi") => {
+    setInterval(() => {
+        reloadThread(general);
+        getCurrentThreadDesc(general);
+    }, 10000);
+
+    setTimeout(() => {
+        setInterval(() => {
+            findNewPosts(general);
+            const newPosts = getNewPosts(general);
+            if (newPosts && newPosts.length) {
+                sendNewPosts(general);
+            }
+        }, 15000);
+    }, 5000);
+
+    setInterval(() => {
+        reloadCatalog(general);
+        setTimeout(() => {
+            findCurrentThread(general);
+        }, 5000);
+    }, 55000);
 };
 
 const checkSubject = (subject, keywords) => {
