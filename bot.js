@@ -68,8 +68,12 @@ const downloadTiktok = (channel, url) => {
             )
             .catch(error => {
                 console.log("DISCORD SEND ERROR", meta);
-                downloadURL(meta.video.download_url, buffer => {
-                    console.log("tiktok response", buffer);
+                downloadURL(meta.video.download_url, buf => {
+                    channel.send(
+                        meta.desc +
+                            " [Can not post 720p cuz server is not lvl2]",
+                        new Discord.Attachment(buf, meta.video.id + ".mp4")
+                    );
                 });
             });
     });
