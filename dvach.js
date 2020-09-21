@@ -268,7 +268,6 @@ export const findBonbiThreadsSubjects = general => {
 
 export const findCurrentThread = (general = "bonbi") => {
     const threads = findBonbiThreadsSubjects(general);
-    console.log("findCurrentThread", threads);
     if (threads && threads.length > 0) {
         state[general].currentThreadDesc = threads[0];
         return state[general].currentThreadDesc;
