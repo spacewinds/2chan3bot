@@ -163,7 +163,7 @@ export const loadMetaInfo = (id, onReady) => {
         .then(response => {
             if (onReady)
                 onReady({
-                    desc: response.data.desc,
+                    desc: response.data.aweme_detail.desc,
                     video: {
                         uri: response.data.aweme_detail.video.play_addr.uri,
                         download_url:
