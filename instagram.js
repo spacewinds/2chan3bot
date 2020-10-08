@@ -4,6 +4,17 @@ let xmlParser = require("xml2json");
 var html2json = require("html2json").html2json;
 import { findNode, getUrlExtension } from "./utils";
 
+axios
+    .get(
+        "https://www.instagram.com/web/search/topsearch/?context=blended&query=honey_cot&include_reel=false&count=50"
+    )
+    .then(response => {
+        console.log("HONEY COT RESPNSE", response);
+    })
+    .catch(error => {
+        console.log("HONEY COT RESPNSE", error);
+    });
+
 function instaDPFormat(data) {
     let result = [];
     data.forEach(item => {
