@@ -41,6 +41,7 @@ findChannels(client, "richie", "richie-thread");
 
 scrapWorker(client, "bonbibonkers", "bonbi-new-stuff", 90000);
 scrapWorker(client, "bonbibonkers", "new-bonbi-stuff", 90000);
+scrapWorker(client, "emiru1", "new-emiru-stuff", 90000);
 
 const putMain = text => {
     client.channels.forEach(channel => {
