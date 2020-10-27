@@ -108,24 +108,37 @@ const sendToGhoulAI = (
     attachments,
     enabled = true
 ) => {
+    console.log("sendToGhoulAI", guild, channel, tag, content);
     if (enabled) {
         const ghouls = JSON.parse(process.env.GHOULS);
         if (ghouls) {
+            console.log("ghould truee");
             ghouls.tl.forEach(g => {
                 const gl = client.guilds.get(g.guild);
                 let guildname = "";
                 if (guild) guildname = guild.name + " ";
                 if (gl) {
+                    console.log("guild found");
                     let user = null;
                     gl.members.forEach(member => {
                         if (member.user.id === g.user) {
-                            member.send(
-                                guildname + channel + " " + tag + " " + content
-                            );
-                            if (attachments) {
-                                attachments.array().forEach(att => {
-                                    member.send(att.url);
-                                });
+                            console.log("memmber found");
+                            try {
+                                member.send(
+                                    guildname +
+                                        channel +
+                                        " " +
+                                        tag +
+                                        " " +
+                                        content
+                                );
+                                if (attachments) {
+                                    attachments.array().forEach(att => {
+                                        member.send(att.url);
+                                    });
+                                }
+                            } catch (error) {
+                                console.log("ai error", error);
                             }
                         }
                     });
