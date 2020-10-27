@@ -108,7 +108,7 @@ const sendToGhoulAI = (
     attachments,
     enabled = true
 ) => {
-    console.log("sendToGhoulAI", guild, channel, tag, content);
+    console.log("sendToGhoulAI", guild.name, channel, tag, content);
     if (enabled) {
         const ghouls = JSON.parse(process.env.GHOULS);
         if (ghouls) {
