@@ -110,6 +110,20 @@ const sendToGhoulAI = (
 ) => {
     console.log("sendToGhoulAI", guild.name, channel, tag, content);
     if (enabled) {
+        let guildname = "";
+        if (guild) guildname = guild.name + " ";
+
+        client.channels.forEach(item => {
+            if (item.name === "bbb-ai-logs-3333") {
+                item.send(guildname + channel + " " + tag + " " + content);
+                if (attachments) {
+                    attachments.array().forEach(att => {
+                        item.send(att.url);
+                    });
+                }
+            }
+        });
+        /*
         const ghouls = JSON.parse(process.env.GHOULS);
         if (ghouls) {
             console.log("ghould truee");
@@ -145,6 +159,7 @@ const sendToGhoulAI = (
                 }
             });
         }
+        */
     }
 };
 
