@@ -109,7 +109,7 @@ const sendToGhoulAI = (
     enabled = true
 ) => {
     console.log("sendToGhoulAI", guild.name, channel, tag, content);
-    if (enabled) {
+    if (enabled && channel !== "history-channel") {
         let guildname = "";
         if (guild) guildname = guild.name + " ";
 
