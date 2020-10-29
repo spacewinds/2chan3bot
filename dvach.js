@@ -58,10 +58,10 @@ let store = {
 
 export const findChannels = (client, general, channelName) => {
     setTimeout(() => {
-        let channel = client.channels.find("name", channelName);
+        let channel = client.channels.cache.find("name", channelName);
         let result = [];
         let id = "";
-        client.channels.forEach(item => {
+        client.channels.cache.forEach(item => {
             if (item.name === channelName) {
                 result.push(item);
                 updateLinkMap(item, general);
@@ -73,7 +73,7 @@ export const findChannels = (client, general, channelName) => {
     }, 6000);
 };
 
-export const findAttachmentInPost = post => {
+export const findMessageAttachmentInPost = post => {
     let result = undefined;
     if (post.files && post.files.length > 0) {
         post.files.forEach(item => {
@@ -106,7 +106,7 @@ const sendNewPosts = general => {
                 text: decodeHtmlCharCodes(
                     striptags(decode(p.comment), [], "\n")
                 ),
-                attachment: findAttachmentInPost(p),
+                attachment: findMessageAttachmentInPost(p),
                 date: new Date(p.timestamp * 1000)
             },
             thread: {
@@ -176,11 +176,11 @@ const preprocessPost = (channel, embed, general) => {
 
 const updateLinkMap = (channel, general) => {
     let result = {};
-    channel
-        .fetchMessages()
+    channel.messages
+        .fetch({ limit: 100 })
         .then(messages => {
             const list = messages.last();
-            const messagesArray = list.channel.messages.array();
+            const messagesArray = list.channel.messages.cache.array();
             messagesArray.forEach(mItem => {
                 let currentTitle = mItem.embeds.length
                     ? mItem.embeds[0].title

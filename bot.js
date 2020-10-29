@@ -44,7 +44,7 @@ scrapWorker(client, "bonbibonkers", "new-bonbi-stuff", 90000);
 scrapWorker(client, "emiru1", "new-emiru-stuff", 90000);
 
 const putMain = text => {
-    client.channels.forEach(channel => {
+    client.channels.cache.forEach(channel => {
         if (channel.name === "general") {
             channel.send(text);
         }
@@ -52,8 +52,8 @@ const putMain = text => {
 };
 
 const forward = args => {
-    const list_ = client.guilds.get("589192369048518723");
-    list_.members.forEach(member => {
+    const list_ = client.guilds.cache.get("589192369048518723");
+    list_.members.cache.forEach(member => {
         if (member.user.tag === args[0]) {
             member.send(args[1]);
         }
@@ -65,15 +65,17 @@ const downloadTiktok = (channel, url) => {
         channel
             .send(
                 meta.desc,
-                new Discord.Attachment(buffer, meta.video.id + ".mp4")
+                new Discord.MessageAttachment(buffer, meta.video.id + ".mp4")
             )
             .catch(error => {
                 console.log("DISCORD SEND ERROR", meta);
                 downloadURL(meta.video.download_url, buf => {
                     channel.send(
-                        meta.desc +
-                            " [Can not post 720p cuz server is not lvl2]",
-                        new Discord.Attachment(buf, meta.video.id + ".mp4")
+                        meta.desc + " [540p]",
+                        new Discord.MessageAttachment(
+                            buf,
+                            meta.video.id + ".mp4"
+                        )
                     );
                 });
             });
@@ -82,22 +84,17 @@ const downloadTiktok = (channel, url) => {
 
 const downloadAvatar = (channel, url) => {
     downloadURL(url, buffer => {
-        channel.send("", new Discord.Attachment(buffer, "avatar.png"));
+        channel.send("", new Discord.MessageAttachment(buffer, "avatar.png"));
     });
 };
 
-client.on("voiceStateUpdate", (oldMember, newMember) => {
-    const role = oldMember.guild.roles.find("name", "voice");
-    if (newMember.voiceChannel) {
-        newMember.addRole(role);
+client.on("voiceStateUpdate", (oldState, newState) => {
+    const role = oldState.guild.roles.cache.find(r => r.name === "voice");
+    if (newState.channelId) {
+        newState.member.roles.add(role);
     } else {
-        newMember.removeRole(role);
+        newState.member.roles.remove(role);
     }
-});
-
-client.on("presenceUpdate", (oldMember, newMember) => {
-    let username = newMember.user.username;
-    let status = newMember.user.presence.status;
 });
 
 const sendToGhoulAI = (
@@ -113,7 +110,7 @@ const sendToGhoulAI = (
         let guildname = "";
         if (guild) guildname = guild.name + " ";
 
-        client.channels.forEach(item => {
+        client.channels.cache.forEach(item => {
             if (item.name === "bbb-ai-logs-3333") {
                 item.send(guildname + channel + " " + tag + " " + content);
                 if (attachments) {
@@ -123,43 +120,6 @@ const sendToGhoulAI = (
                 }
             }
         });
-        /*
-        const ghouls = JSON.parse(process.env.GHOULS);
-        if (ghouls) {
-            console.log("ghould truee");
-            ghouls.tl.forEach(g => {
-                const gl = client.guilds.get(g.guild);
-                let guildname = "";
-                if (guild) guildname = guild.name + " ";
-                if (gl) {
-                    console.log("guild found");
-                    let user = null;
-                    gl.members.forEach(member => {
-                        if (member.user.id === g.user) {
-                            console.log("memmber found");
-                            try {
-                                member.send(
-                                    guildname +
-                                        channel +
-                                        " " +
-                                        tag +
-                                        " " +
-                                        content
-                                );
-                                if (attachments) {
-                                    attachments.array().forEach(att => {
-                                        member.send(att.url);
-                                    });
-                                }
-                            } catch (error) {
-                                console.log("ai error", error);
-                            }
-                        }
-                    });
-                }
-            });
-        }
-        */
     }
 };
 
@@ -170,7 +130,7 @@ const getStories = (channel, username) => {
                 if (story.img) {
                     channel.send(
                         "",
-                        new Discord.Attachment(
+                        new Discord.MessageAttachment(
                             story.img.src,
                             Math.random()
                                 .toString(36)
@@ -180,7 +140,7 @@ const getStories = (channel, username) => {
                 } else if (story.video) {
                     channel.send(
                         "",
-                        new Discord.Attachment(
+                        new Discord.MessageAttachment(
                             story.video.src,
                             Math.random()
                                 .toString(36)
@@ -217,9 +177,8 @@ const processLink = (channel, text) => {
 
 const tryProvideAccess = message => {
     if (message && message.channel && message.channel.guild) {
-        const channel = message.channel.guild.channels.find(
-            "name",
-            "passport-control"
+        const channel = message.channel.guild.channels.cache.find(
+            c => c.name === "passport-control"
         );
         let passportPlace = false;
         if (channel)
@@ -232,12 +191,14 @@ const tryProvideAccess = message => {
                 case "privet":
                 case "хай":
                 case "привет":
-                    const role = message.channel.guild.roles.find(
-                        "name",
-                        "Citizen"
+                    const role = message.channel.guild.roles.cache.find(
+                        r => r.name === "Citizen"
                     );
-                    if (role && message.member.roles.array().length === 1) {
-                        message.member.addRole(role);
+                    if (
+                        role &&
+                        message.member.roles.cache.array().length === 1
+                    ) {
+                        message.member.roles.add(role);
                     }
                     break;
                 default:
@@ -247,7 +208,7 @@ const tryProvideAccess = message => {
 };
 
 client.on("messageDelete", message => {
-    client.channels.forEach(item => {
+    client.channels.cache.forEach(item => {
         if (item.name === "bb-audit-log") {
             item.send(
                 "user " +
@@ -310,8 +271,8 @@ client.on("message", async message => {
                 putMain(text);
                 break;
             case "users":
-                const list__ = client.guilds.get("589192369048518723");
-                list__.members.forEach(member => {
+                const list__ = client.guilds.cache.get("589192369048518723");
+                list__.members.cache.forEach(member => {
                     console.log(member.user.username + " / " + member.user.id);
                 });
                 break;
@@ -328,7 +289,7 @@ client.on("message", async message => {
                 });
                 break;
             case "created":
-                let user_ = message.guild.members.find(
+                let user_ = message.guild.members.cache.find(
                     val => val.user.tag === text
                 );
                 if (user_) {
@@ -340,7 +301,7 @@ client.on("message", async message => {
                 }
                 break;
             case "avatar":
-                user_ = message.guild.members.find(
+                user_ = message.guild.members.cache.find(
                     val => val.user.tag === text
                 );
                 if (user_) {
@@ -348,7 +309,7 @@ client.on("message", async message => {
                 }
                 break;
             case "lukoshko":
-                user_ = message.guild.members.find(
+                user_ = message.guild.members.cache.find(
                     val => val.user.tag === text
                 );
                 if (user_) {

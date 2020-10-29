@@ -40,7 +40,7 @@ export const randomTTPost = (channel, username) => {
         randomPost(scrap[username], username, (meta, buffer) => {
             channel.send(
                 meta.video.description,
-                new Discord.Attachment(buffer, meta.video.id + ".mp4")
+                new Discord.MessageAttachment(buffer, meta.video.id + ".mp4")
             );
         });
     } else {
@@ -74,11 +74,11 @@ export const scrapWorker = (client, username, channelName, timeout = 60000) => {
                                     video.id;
 
                                 downloadTiktokMeta(link, (meta, buffer) => {
-                                    client.channels.forEach(item => {
+                                    client.channels.cache.forEach(item => {
                                         if (item.name === channelName) {
                                             item.send(
                                                 meta.video.description,
-                                                new Discord.Attachment(
+                                                new Discord.MessageAttachment(
                                                     buffer,
                                                     meta.video.id + ".mp4"
                                                 )
