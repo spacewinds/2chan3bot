@@ -88,15 +88,15 @@ const downloadAvatar = (channel, url) => {
     });
 };
 
-client.on("voiceStateUpdate", (oldMember, newMember) => {
-    console.log("voiceStateUpdateTrigger", oldMember, newMember);
-    const role = oldMember.guild.roles.cache.find(r => r.name === "voice");
-    console.log("member orless", newMember.roles);
-    if (newMember.channelID) {
-        newMember.member.roles.add(role);
+client.on("voiceStateUpdate", (oldState, newState) => {
+    console.log("voiceStateUpdateTrigger", oldState, newState);
+    const role = oldState.guild.roles.cache.find(r => r.name === "voice");
+    console.log("member orless", newState.roles);
+    if (newState.channelID) {
+        newState.member.roles.add(role);
     } else {
         try {
-            newMember.member.roles.remove(role);
+            newState.member.roles.remove(role);
         } catch (error) {
             console.log(error);
         }
