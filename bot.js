@@ -88,12 +88,18 @@ const downloadAvatar = (channel, url) => {
     });
 };
 
-client.on("voiceStateUpdate", (oldState, newState) => {
-    const role = oldState.guild.roles.cache.find(r => r.name === "voice");
-    if (newState.channelId) {
-        newState.member.roles.add(role);
+client.on("voiceStateUpdate", (oldMember, newMember) => {
+    console.log("voiceStateUpdateTrigger", oldMember, newMember);
+    const role = oldMember.guild.roles.cache.find(r => r.name === "voice");
+    console.log("member orless", newMember.roles);
+    if (newMember.channelID) {
+        newMember.member.roles.add(role);
     } else {
-        newState.member.roles.remove(role);
+        try {
+            newMember.member.roles.remove(role);
+        } catch (error) {
+            console.log(error);
+        }
     }
 });
 
