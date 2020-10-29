@@ -58,7 +58,7 @@ let store = {
 
 export const findChannels = (client, general, channelName) => {
     setTimeout(() => {
-        let channel = client.channels.cache.find("name", channelName);
+        let channel = client.channels.cache.find(c => c.name === channelName);
         let result = [];
         let id = "";
         client.channels.cache.forEach(item => {
