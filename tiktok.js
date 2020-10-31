@@ -156,7 +156,7 @@ export const loadMetaInfo = (id, onReady) => {
       headers: headersJson,
     })
     .then((response) => {
-      console.log("META RESULT", response.data);
+      console.log("META RESULT", response);
       if (onReady)
         onReady({
           desc: response.data.aweme_detail.desc,
