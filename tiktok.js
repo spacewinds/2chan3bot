@@ -290,7 +290,9 @@ const improveQuality = (meta, buf, onReady, improveBitrate = 1, count = 0) => {
 };
 
 export const downloadTiktokMeta = (url, onReady, improveBitrate = 1) => {
+    console.log("downloadTiktokMeta", url);
     extractIdFromUrl(url, desc => {
+        console.log("desc", desc);
         loadMetaInfo(
             desc.videoId,
             meta => {
