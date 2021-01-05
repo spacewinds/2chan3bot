@@ -5,7 +5,7 @@
     "main": "bot.js",
     "author": "Nother",
     "dependencies": {
-        "axios": "^0.19.0",
+        "axios": "^0.21.1",
         "babel-cli": "^6.26.0",
         "babel-preset-env": "^1.7.0",
         "crypto": "^1.0.1",
