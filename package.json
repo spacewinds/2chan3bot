@@ -16,7 +16,7 @@
         "kayn": "^0.10.2",
         "moment": "^2.24.0",
         "sharp": "^0.24.0",
-        "striptags": "^3.1.1",
+        "striptags": "^3.2.0",
         "tiktok-scraper": "^1.4.0",
         "winston": "^3.2.1",
         "xml2json": "^0.12.0"
